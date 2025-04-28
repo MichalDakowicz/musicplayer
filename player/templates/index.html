@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Music Player Home</title>
+        <link rel="stylesheet" href="{% static 'style.css' %}" />
+    </head>
+    <body>
+        <div class="container">
+            <h1>Welcome, {{ user.username }}!</h1>
+            <p>This is your music player home page.</p>
+            <form action="{% url 'logout' %}" method="post">
+                {# Assuming 'logout' is the name of your logout view URL #} 
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </body>
+</html>
