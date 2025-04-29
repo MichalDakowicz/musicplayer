@@ -11,9 +11,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv # Import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -112,17 +117,42 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+# Spotify API Credentials (Loaded from .env)
+# Use os.getenv to read the values loaded by load_dotenv
+SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+# Keep the redirect URI loading as before, or move it to .env as well
+SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI', 'http://127.0.0.1:8000/callback') # Default if not in .env
 
-STATIC_URL = 'static/'
+# Add a check to warn if credentials are not loaded
+if not SPOTIPY_CLIENT_ID or not SPOTIPY_CLIENT_SECRET:
+    print("WARNING: Spotify Client ID or Secret not found in environment variables (.env file).")
+
+
+# Media Files (User-uploaded content like song files, cover images)
+MEDIA_URL = '/media/'
+# Ensure BASE_DIR is defined above this line in your settings
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# SpotDL Download Path (where downloaded songs will be initially placed)
+# This should be within MEDIA_ROOT if you want Django to potentially serve them
+# or if you move them into the final Song.file path later.
+SPOTDL_DOWNLOAD_PATH = os.path.join(MEDIA_ROOT, 'songs') # spotdl will create subdirs here
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+
+# Add this list to tell Django where to find your app's static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'player/static'),
+]
+
+# Default login/logout URLs
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Add these lines at the end of the file
-LOGIN_URL = 'login'  # The name of the URL pattern for your login view
-LOGIN_REDIRECT_URL = 'home' # The name of the URL pattern to redirect to after successful login
-LOGOUT_REDIRECT_URL = 'login' # Optional: Where to redirect after logout

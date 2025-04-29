@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse All Songs</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    {# Add Font Awesome CDN Link #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <h1>Browse All Songs</h1>
+
+    {% if all_songs %}
+        <ul class="item-list browse-songs-list"> {# Use item-list class #}
+            {% for song in all_songs %}
+                <li>
+                    <span class="item-info"> {# Use item-info wrapper #}
+                         <span class="item-title">{{ song.title }}</span>
+                         <span class="item-artist">{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                         {# Optionally display album/release info #}
+                         {# {% with release=song.get_release %} #}
+                         {# {% if release %}<span class="item-meta">({{ release.title }})</span>{% endif %} #}
+                         {# {% endwith %} #}
+                    </span>
+                    <div class="actions">
+                        {% if song.file %}
+                            {# Changed to button with data attributes #}
+                            <button type="button" class="action-button play-button"
+                                    data-song-url="{{ song.file.url }}"
+                                    data-song-title="{{ song.title }}"
+                                    data-song-artist="{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                                    data-song-cover="{% with release=song.get_release %}{% if release.cover_image %}{{ release.cover_image.url }}{% elif release.cover_image_url %}{{ release.cover_image_url }}{% else %}{% static 'placeholder-cover.png' %}{% endif %}{% endwith %}">
+                                Play
+                            </button>
+                        {% else %}
+                            <span class="file-missing">(File missing)</span>
+                        {% endif %}
+
+                        {# Add/Remove Buttons #}
+                        {% if song.id in user_library_song_ids %}
+                            {# Song is in library - Show Remove button #}
+                            <form action="{% url 'remove_song_from_library' song.id %}" method="post" class="inline-form"> {# Use inline-form class #}
+                                {% csrf_token %}
+                                <button type="submit" class="action-button remove-btn">Remove</button> {# Use action-button class #}
+                            </form>
+                        {% else %}
+                            {# Song is NOT in library - Show Add button #}
+                            <form action="{% url 'add_song_to_library' song.id %}" method="post" class="inline-form"> {# Use inline-form class #}
+                                {% csrf_token %}
+                                <button type="submit" class="action-button add-btn">Add</button> {# Use action-button class #}
+                            </form>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No songs found in the database yet.</p>
+    {% endif %}
+
+    <div class="back-link"> {# Use div for consistency #}
+        <a href="{% url 'home' %}">Back to Home</a>
+    </div>
+
+    <!-- Audio Player (Include here or use a base template) -->
+    <div class="audio-player-container">
+        {# Player Cover Art - src is handled by JS #}
+        <img id="player-cover-art" src="{% static 'placeholder-cover.png' %}" alt="Cover Art" class="player-cover">
+
+        <div class="current-track-info">
+            <span id="current-track-title">No track selected</span>
+            <span id="current-track-artist"></span>
+        </div>
+
+        <div class="player-controls">
+            <button id="play-pause-button" class="control-button">
+                <i id="play-icon" class="fa-solid fa-play"></i>
+                <i id="pause-icon" class="fa-solid fa-pause" style="display: none;"></i>
+            </button>
+            <span id="current-time" class="time-display">0:00</span>
+            <input type="range" id="seek-bar" value="0" step="0.1" class="seek-bar">
+            <span id="duration" class="time-display">0:00</span>
+        </div>
+
+        <div class="volume-control">
+             {# Updated Volume Icon Container with Font Awesome #}
+             <div class="volume-icon-container">
+                 <i id="volume-mute-icon" class="fa-solid fa-volume-xmark"></i>
+                 <i id="volume-low-icon" class="fa-solid fa-volume-low"></i>
+                 <i id="volume-high-icon" class="fa-solid fa-volume-high active"></i>
+             </div>
+             <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="0.8" class="volume-bar">
+        </div>
+
+        {# Hidden actual audio element #}
+        <audio id="audio-player" preload="metadata"></audio>
+    </div>
+
+    {# Link the JavaScript file at the end of the body #}
+    <script src="{% static 'player.js' %}"></script>
+
+</body>
+</html>

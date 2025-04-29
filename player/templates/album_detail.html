@@ -1,0 +1,221 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ album.title }} - Album Details</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    {# Add Font Awesome CDN Link #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .album-header {
+            display: flex;
+            align-items: flex-start; /* Align items to the top */
+            margin-bottom: 30px;
+            max-width: 700px;
+            width: 100%;
+        }
+        .album-cover {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-right: 20px;
+            border-radius: 4px;
+            background-color: #333; /* Placeholder bg */
+        }
+        .album-info h1 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .album-info p {
+            margin: 5px 0;
+            color: #b3b3b3;
+            text-align: left;
+        }
+        .song-list { /* Reusing some styles from browse_songs */
+            list-style: none;
+            padding: 0;
+            max-width: 700px;
+            width: 100%;
+        }
+        .song-list li {
+            padding: 10px 5px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .song-list li:last-child {
+            border-bottom: none;
+        }
+        .song-list li span { /* Song title */
+            flex-grow: 1;
+            margin-right: 15px;
+            color: #e0e0e0;
+        }
+        .song-list li .actions {
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .song-list li .actions form {
+            margin: 0 5px 0 0;
+            padding: 0;
+            max-width: none;
+            width: auto;
+        }
+        .song-list li .actions button {
+            padding: 4px 8px;
+            font-size: 0.8em;
+            margin: 0;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .song-list li .actions .add-btn {
+            background-color: #1DB954; color: white; border: none;
+        }
+        .song-list li .actions .remove-btn {
+            background-color: #d9534f; color: white; border: none;
+        }
+        .song-list li .actions .add-btn:hover { background-color: #188942; }
+        .song-list li .actions .remove-btn:hover { background-color: #c9302c; }
+        .song-list li .actions .play-button { /* Style the new play button */
+             /* Inherit from .action-button or define specific styles */
+             padding: 6px 12px;
+             font-size: 0.85em;
+             border-radius: 50px;
+             cursor: pointer;
+             border: 1px solid #1DB954;
+             background-color: transparent;
+             color: #1DB954;
+             font-weight: bold;
+             text-transform: uppercase;
+             letter-spacing: 0.5px;
+             transition: background-color 0.2s ease, color 0.2s ease;
+             white-space: nowrap;
+             margin-right: 8px; /* Space before add/remove */
+        }
+        .song-list li .actions .play-button:hover {
+            background-color: #1DB954;
+            color: #ffffff;
+        }
+        .song-list li .file-missing {
+            color: #aaa; font-style: italic; white-space: nowrap; margin-left: 10px;
+        }
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            max-width: 700px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="album-header">
+        {# Check for downloaded image first, then fallback to URL #}
+        {% if album.cover_image %}
+            <img src="{{ album.cover_image.url }}" alt="{{ album.title }} Cover" class="album-cover">
+        {% elif album.cover_image_url %}
+            {# If downloaded image doesn't exist, use the URL from Spotify #}
+            <img src="{{ album.cover_image_url }}" alt="{{ album.title }} Cover (from URL)" class="album-cover">
+        {% else %}
+            <div class="album-cover"></div> <!-- Placeholder if neither exists -->
+        {% endif %}
+        <div class="album-info">
+            <h1>{{ album.title }}</h1>
+            <p>By: {% for artist in album.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            {% if album.release_date %}
+                <p>Released: {{ album.release_date|date:"Y" }}</p> {# Display year only or full date #}
+            {% endif %}
+            <p>{{ album_songs.count }} song{{ album_songs.count|pluralize }}</p>
+        </div>
+    </div>
+
+    {% if album_songs %}
+        <ul class="song-list">
+            {% for song in album_songs %}
+                <li>
+                    <span>{{ song.title }}</span> {# Add track number if available #}
+                    <div class="actions">
+                        {% if song.file %}
+                            {# Changed to button with data attributes #}
+                            <button type="button" class="play-button" {# Removed action-button class to use specific style above #}
+                                    data-song-url="{{ song.file.url }}"
+                                    data-song-title="{{ song.title }}"
+                                    data-song-artist="{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                                    data-song-cover="{% with release=song.get_release %}{% if release.cover_image %}{{ release.cover_image.url }}{% elif release.cover_image_url %}{{ release.cover_image_url }}{% else %}{% static 'placeholder-cover.png' %}{% endif %}{% endwith %}">
+                                Play
+                            </button>
+                        {% else %}
+                            <span class="file-missing">(File missing)</span>
+                        {% endif %}
+
+                        {# Add/Remove Buttons #}
+                        {% if song.id in user_library_song_ids %}
+                            <form action="{% url 'remove_song_from_library' song.id %}" method="post" class="inline-form">
+                                {% csrf_token %}
+                                <button type="submit" class="action-button remove-btn">Remove</button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'add_song_to_library' song.id %}" method="post" class="inline-form">
+                                {% csrf_token %}
+                                <button type="submit" class="action-button add-btn">Add</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p style="text-align: center; max-width: 700px; width: 100%;">No songs found for this album.</p>
+    {% endif %}
+
+    <p class="back-link">
+        <a href="{% url 'home' %}">Back to Home</a> |
+        <a href="{% url 'browse_songs' %}">Browse All Songs</a>
+    </p>
+
+    <!-- Audio Player (Include here or use a base template) -->
+    <div class="audio-player-container">
+        {# Player Cover Art - src is handled by JS #}
+        <img id="player-cover-art" src="{% static 'placeholder-cover.png' %}" alt="Cover Art" class="player-cover">
+
+        <div class="current-track-info">
+            <span id="current-track-title">No track selected</span>
+            <span id="current-track-artist"></span>
+        </div>
+
+        <div class="player-controls">
+            <button id="play-pause-button" class="control-button">
+                <svg id="play-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z"></path></svg>
+                <svg id="pause-icon" viewBox="0 0 16 16" fill="currentColor" style="display: none;"><path d="M5.5 3.5A1.5 1.5 0 017 5v6a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5zm5 0A1.5 1.5 0 0112 5v6a1.5 1.5 0 01-3 0V5a1.5 1.5 0 011.5-1.5z"></path></svg>
+            </button>
+            <span id="current-time" class="time-display">0:00</span>
+            <input type="range" id="seek-bar" value="0" step="0.1" class="seek-bar">
+            <span id="duration" class="time-display">0:00</span>
+        </div>
+
+        <div class="volume-control">
+             {# Updated Volume Icon Container with Font Awesome #}
+             <div class="volume-icon-container">
+                 <i id="volume-mute-icon" class="fa-solid fa-volume-xmark"></i>
+                 <i id="volume-low-icon" class="fa-solid fa-volume-low"></i>
+                 <i id="volume-high-icon" class="fa-solid fa-volume-high active"></i>
+             </div>
+             <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="0.8" class="volume-bar">
+        </div>
+
+        {# Hidden actual audio element #}
+        <audio id="audio-player" preload="metadata"></audio>
+    </div>
+
+    {# Link the JavaScript file at the end of the body #}
+    <script src="{% static 'player.js' %}"></script>
+
+</body>
+</html>

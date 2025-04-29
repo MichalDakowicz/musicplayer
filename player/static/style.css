@@ -1,10 +1,19 @@
 body {
-    font-family: sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Modern font */
     margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
+    /* Increased bottom padding to ensure content doesn't hide behind player */
+    padding: 20px 40px 90px 40px; /* Adjusted padding, increased bottom */
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    display: flex; /* Enable flexbox for centering */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    min-height: 100vh; /* Ensure body takes full viewport height */
+    box-sizing: border-box; /* Ensure padding is included in height */
 }
 
+/* Remove or comment out the .container rule */
+/*
 .container {
     max-width: 500px;
     margin: 40px auto;
@@ -13,41 +22,118 @@ body {
     border: 1px solid #ddd;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+*/
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #ffffff; /* White heading */
+    width: 100%; /* Ensure h1 takes width for centering */
+    max-width: 700px; /* Wider max-width for content areas */
+    margin-bottom: 30px; /* More space below main heading */
+    font-weight: 700; /* Bolder heading */
 }
+
+h2 {
+    color: #ffffff;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 700px;
+    font-weight: 600; /* Slightly bolder sub-heading */
+}
+
+h3 {
+    color: #b3b3b3;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 700px;
+    font-weight: 500;
+}
+
+
+form { /* Center form and limit its width, but remove container look */
+    width: 100%;
+    max-width: 400px; /* Adjust as needed */
+    margin: 20px 0; /* Add some vertical margin */
+    box-sizing: border-box;
+    /* Removed background/border for non-container look */
+    background-color: #181818; /* Slightly lighter form background */
+    padding: 25px; /* Slightly more padding */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+/* Specific styling for login/register forms */
+form#login-form, form#register-form {
+    background-color: #181818;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 
 form label,
 form input,
 form button {
     display: block;
-    width: 95%; /* Slightly less than 100% to prevent overflow */
+    width: 100%; /* Inputs/button take full width of form */
     margin-bottom: 15px;
+    box-sizing: border-box; /* Include padding/border in width */
 }
 
 form input[type="text"],
 form input[type="email"],
-form input[type="password"] {
-    padding: 10px;
-    border: 1px solid #ccc;
+form input[type="password"],
+form input[type="url"] { /* Added url type */
+    padding: 12px 15px; /* Slightly larger padding */
+    border: 1px solid #555; /* Darker border */
     border-radius: 4px;
+    background-color: #333; /* Dark input background */
+    color: #e0e0e0; /* Light input text */
+    font-size: 1rem;
+}
+/* Focus style for inputs */
+form input[type="text"]:focus,
+form input[type="email"]:focus,
+form input[type="password"]:focus,
+form input[type="url"]:focus {
+    outline: none;
+    border-color: #1DB954; /* Highlight border on focus */
+    box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3); /* Subtle glow */
 }
 
+
+/* Add placeholder color */
+form input::placeholder {
+    color: #888;
+}
+
+
 form button {
-    padding: 10px 15px;
-    background-color: #5cb85c;
+    padding: 12px 15px; /* Consistent padding */
+    background-color: #1DB954; /* Spotify green */
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 50px; /* Pill shape */
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem; /* Consistent font size */
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Added transform transition */
 }
 
 form button:hover {
-    background-color: #4cae4c;
+    background-color: #1ED760; /* Lighter green on hover */
 }
+/* Add active state for button press */
+form button:active {
+    transform: scale(0.98); /* Slightly shrink on press */
+}
+
 
 /* Style for Django form paragraph elements */
 form p {
@@ -58,31 +144,470 @@ form p label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
+    color: #e0e0e0; /* Ensure label text is light */
 }
 
 form p input {
-    width: 95%; /* Match other inputs */
-    padding: 10px;
-    border: 1px solid #ccc;
+    width: 100%; /* Match other inputs */
+    padding: 12px 15px; /* Consistent padding */
+    border: 1px solid #555; /* Darker border */
     border-radius: 4px;
+    background-color: #333; /* Dark input background */
+    color: #e0e0e0; /* Light input text */
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    font-size: 1rem; /* Consistent font size */
+}
+/* Focus style for Django form inputs */
+form p input:focus {
+    outline: none;
+    border-color: #1DB954;
+    box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3);
 }
 
-.error {
-    color: red;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
+/* General paragraph styling */
 p {
     text-align: center;
+    width: 100%;
+    max-width: 700px; /* Wider max-width */
+    color: #b0b0b0; /* Slightly dimmer paragraph text */
+    line-height: 1.5;
 }
 
 a {
-    color: #0275d8;
+    color: #1DB954; /* Spotify green for links */
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 a:hover {
-    text-decoration: underline;
+    text-decoration: none; /* Remove underline on hover */
+    color: #1ED760; /* Lighter green on hover */
+}
+
+/* Navigation Links */
+.nav-links {
+    margin: 20px 0 40px 0;
+    text-align: center;
+    width: 100%;
+    max-width: 700px;
+}
+
+.nav-links a {
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+/* Library Section */
+.library-section {
+    width: 100%;
+    max-width: 700px;
+    margin-top: 20px;
+}
+
+/* Item Lists (Songs, Albums, Artists, Playlists) */
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    width: 100%;
+}
+
+.item-list li, .song-list li { /* Apply to both list types */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 10px;
+    border-bottom: 1px solid #282828; /* Subtle separator */
+    transition: background-color 0.2s ease;
+    border-radius: 4px; /* Slight rounding */
+    min-height: 40px; /* Ensure consistent height */
+}
+
+.item-list li:hover, .song-list li:hover {
+    background-color: #2a2a2a; /* Slightly darker highlight on hover */
+}
+
+.item-list li:last-child, .song-list li:last-child {
+    border-bottom: none;
+}
+
+.item-info {
+    flex-grow: 1;
+    margin-right: 15px;
+    display: flex;
+    flex-direction: column; /* Stack title and artist */
+}
+
+.item-title, .song-list li > span { /* Target song title in both list types */
+    color: #ffffff; /* White title */
+    font-weight: 500;
+    margin-bottom: 3px; /* Space between title and artist */
+    line-height: 1.3; /* Adjust line height */
+}
+
+.item-artist, .item-meta {
+    color: #b3b3b3; /* Grey artist/meta text */
+    font-size: 0.9em;
+    line-height: 1.3;
+}
+
+/* Actions within lists */
+.actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; /* Prevent actions from shrinking */
+}
+
+.actions form, .song-list li .actions form { /* Target forms in actions */
+    margin: 0 0 0 8px; /* Space between buttons/links */
+    padding: 0;
+    max-width: none;
+    width: auto;
+    background: none; /* Remove form background in lists */
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/* General Action Button Style */
+.action-button, .song-list li .actions button {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    border-radius: 50px; /* Pill shape */
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease; /* Added transform */
+    white-space: nowrap; /* Prevent wrapping */
+    margin: 0; /* Reset margin */
+    display: inline-flex; /* Align text/icons nicely */
+    align-items: center;
+    justify-content: center;
+}
+/* Active state for action buttons */
+.action-button:active, .song-list li .actions button:active {
+    transform: scale(0.96);
+}
+
+
+/* Specific Button Styles */
+/* Play button in lists (now a button, not a link) */
+.action-button.play-button, .song-list li .actions .play-button {
+    background-color: transparent;
+    color: #1DB954;
+    border: 1px solid #b3b3b3; /* Subtle grey border */
+    margin-right: 8px; /* Space before add/remove */
+    padding: 5px 10px; /* Slightly smaller padding */
+}
+.action-button.play-button:hover, .song-list li .actions .play-button:hover {
+    background-color: #1DB954;
+    color: #ffffff;
+    border-color: #1DB954; /* Green border on hover */
+}
+
+/* Remove play-link styles as it's now play-button */
+/* .action-button.play-link, .song-list li a.play-link { ... } */
+/* .action-button.play-link:hover, .song-list li a.play-link:hover { ... } */
+
+.action-button.add-btn, .song-list li .actions .add-btn {
+    background-color: #1DB954;
+    color: white;
+    border: none; /* Ensure no border */
+}
+.action-button.add-btn:hover, .song-list li .actions .add-btn:hover {
+    background-color: #1ED760;
+}
+
+.action-button.remove-btn, .song-list li .actions .remove-btn {
+    background-color: transparent; /* Make remove less prominent */
+    color: #b3b3b3;
+    border: 1px solid #555; /* Subtle border */
+}
+.action-button.remove-btn:hover, .song-list li .actions .remove-btn:hover {
+    background-color: #333; /* Darker background on hover */
+    color: #ffffff;
+    border-color: #777;
+}
+
+.file-missing {
+    color: #aaa;
+    font-style: italic;
+    font-size: 0.85em;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+/* Detail Links (e.g., Album/Artist names) */
+.detail-link {
+    color: #ffffff; /* White link for main items */
+    font-weight: 500;
+}
+.detail-link:hover {
+    color: #1ED760; /* Spotify green on hover */
+}
+
+/* Empty Library Message */
+.empty-library {
+    color: #888;
+    font-style: italic;
+    text-align: left; /* Align with list items */
+    margin-top: 10px;
+    max-width: 700px;
+    width: 100%;
+}
+
+/* Logout Form/Button */
+.logout-form {
+    margin-top: 40px;
+    background: none; /* No background for logout */
+    padding: 0;
+    box-shadow: none;
+    max-width: 150px; /* Limit width */
+}
+
+.logout-form button {
+    background-color: #333; /* Darker grey logout button */
+    font-size: 0.9em;
+    color: #b3b3b3;
+}
+.logout-form button:hover {
+    background-color: #555;
+    color: #ffffff;
+}
+.logout-form button:active {
+    transform: scale(0.98);
+}
+
+/* Audio Player Styles */
+.audio-player-container {
+    position: fixed; /* Keep player fixed at the bottom */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #181818; /* Slightly lighter dark background */
+    padding: 0 15px; /* Adjusted padding */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space out info and controls */
+    box-sizing: border-box;
+    z-index: 1000; /* Ensure it's above other content */
+    height: 75px; /* Slightly increased fixed height for the player bar */
+    border-top: 1px solid #282828; /* Subtle top border */
+}
+
+/* New style for player cover art */
+.player-cover {
+    height: 50px; /* Adjust size as needed */
+    width: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 15px; /* Space between cover and track info */
+    background-color: #333; /* Placeholder background */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+
+.current-track-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center vertically */
+    color: #e0e0e0;
+    margin-right: 15px; /* Adjusted margin */
+    text-align: left;
+    min-width: 100px; /* Adjusted min-width */
+    max-width: 200px; /* Adjusted max-width */
+    flex-shrink: 1; /* Allow shrinking if needed */
+    overflow: hidden; /* Hide overflow */
+    white-space: nowrap; /* Prevent wrapping */
+}
+#current-track-title {
+    font-weight: 500;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis if title is too long */
+}
+#current-track-artist {
+    font-size: 0.85em;
+    color: #b3b3b3;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis if artist is too long */
+}
+
+
+/* Remove default audio player styling */
+#audio-player {
+    display: none; /* Hide the default player */
+}
+
+
+/* Custom Player Controls */
+.player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center controls horizontally */
+    flex-grow: 1; /* Allow controls to take up space */
+    margin: 0 15px; /* Adjusted spacing */
+    min-width: 200px; /* Adjusted min-width */
+}
+
+.control-button {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    cursor: pointer;
+    padding: 5px;
+    margin: 0 10px; /* Space around buttons */
+    display: flex; /* Align icon */
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.1s ease; /* Added transform */
+}
+
+.control-button i {
+    font-size: 24px; /* Size of play/pause icons */
+    fill: currentColor; /* Use button color */
+}
+
+.control-button:hover {
+    color: #ffffff; /* White on hover */
+}
+.control-button:active {
+    transform: scale(0.95); /* Slightly shrink icon on press */
+}
+
+/* Make main play/pause button larger */
+#play-pause-button i {
+    font-size: 32px;
+}
+
+
+.time-display {
+    color: #b3b3b3;
+    font-size: 0.8em;
+    min-width: 40px; /* Prevent layout shifts, slightly wider */
+    text-align: center;
+}
+
+/* Slider Styles (Seek and Volume) */
+input[type="range"].seek-bar,
+input[type="range"].volume-bar {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    height: 4px; /* Track height */
+    background: #4d4d4d; /* Slightly lighter track background */
+    border-radius: 2px;
+    cursor: pointer;
+    margin: 0 10px; /* Space around sliders */
+    outline: none; /* Remove default outline */
+    transition: background 0.2s ease; /* Smooth background transition */
+}
+/* Style the track fill (progress) - Webkit */
+input[type="range"].seek-bar::-webkit-slider-runnable-track,
+input[type="range"].volume-bar::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #4d4d4d;
+    border-radius: 2px;
+}
+/* Style the track fill (progress) - Firefox */
+input[type="range"].seek-bar::-moz-range-track,
+input[type="range"].volume-bar::-moz-range-track {
+    height: 4px;
+    background: #4d4d4d;
+    border-radius: 2px;
+    border: none; /* Remove Firefox default border */
+}
+
+/* Hover effect for the track */
+input[type="range"].seek-bar:hover,
+input[type="range"].volume-bar:hover {
+    /* We will style the thumb on hover instead */
+}
+
+input[type="range"].seek-bar {
+    flex-grow: 1; /* Seek bar takes available space */
+    max-width: 400px; /* Limit max width */
+}
+
+input[type="range"].volume-bar {
+    width: 80px; /* Fixed width for volume */
+}
+
+/* Slider Thumb */
+input[type="range"].seek-bar::-webkit-slider-thumb,
+input[type="range"].volume-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px; /* Thumb size */
+    height: 12px;
+    background: #b3b3b3; /* Thumb color */
+    border-radius: 50%;
+    cursor: pointer;
+    margin-top: -4px; /* Center thumb vertically on track */
+    transition: background 0.1s ease, box-shadow 0.1s ease;
+}
+input[type="range"].seek-bar::-moz-range-thumb,
+input[type="range"].volume-bar::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: #b3b3b3;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none; /* Remove default border in Firefox */
+    transition: background 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Slider Thumb Hover/Active */
+input[type="range"].seek-bar:hover::-webkit-slider-thumb,
+input[type="range"].volume-bar:hover::-webkit-slider-thumb {
+    background: #ffffff; /* White thumb on hover */
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2); /* Subtle glow */
+}
+input[type="range"].seek-bar:hover::-moz-range-thumb,
+input[type="range"].volume-bar:hover::-moz-range-thumb {
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+/* Change track color up to the thumb on hover */
+input[type="range"].seek-bar:hover,
+input[type="range"].volume-bar:hover {
+    /* This requires JS to update a background gradient, complex. */
+    /* Alternative: Make the whole track slightly lighter on hover */
+    background: #5a5a5a;
+}
+
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; /* Prevent shrinking */
+    min-width: 150px; /* Increased min-width to fit icon */
+    justify-content: flex-end; /* Align volume slider to the right */
+}
+
+/* New styles for volume icon */
+.volume-icon-container {
+    margin-right: 8px; /* Space between icon and slider */
+    color: #b3b3b3; /* Default icon color */
+    cursor: pointer; /* Optional: Add if making icon clickable later */
+    transition: color 0.2s ease;
+    width: 20px; /* Set a fixed width for alignment */
+    text-align: center; /* Center the icon */
+}
+
+.volume-icon-container i { /* Target i tags instead of svg */
+    font-size: 18px; /* Adjust icon size if needed */
+    /* width/height are less relevant for font icons */
+    /* fill: currentColor; Removed, color is inherited */
+    display: none; /* Hide all by default, JS will show the correct one */
+    vertical-align: middle; /* Align icon vertically */
+}
+
+.volume-icon-container i.active { /* Target i tags */
+    display: inline-block; /* Show the active icon */
+}
+
+.volume-icon-container:hover {
+    color: #ffffff; /* White on hover */
 }
