@@ -1,158 +1,149 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Music Player Home</title>
-        <link rel="stylesheet" href="{% static 'style.css' %}" />
-        {# Add Font Awesome CDN Link #}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </head>
-    <body>
-        <h1>Welcome, {{ user.username }}!</h1>
-        <p>This is your music player home page.</p>
 
-        <!-- Links -->
-        <div class="nav-links"> {# Use wrapper div #}
-            <a href="{% url 'add_spotify_content' %}">Add from Spotify URL</a> |
-            <a href="{% url 'browse_songs' %}">Browse All Songs</a>
-        </div>
+{% block title %}Home - Music Player{% endblock %}
 
+{% block content %}
+    <h1>Welcome, {{ user.username }}!</h1>
+    <p>This is your music player home page.</p>
 
-        <!-- Library Sections -->
-        <div class="library-section">
-            <h2>Your Library</h2>
+    <!-- Links - Add 'ajax-link' class and data-target-url -->
+    <div class="nav-links">
+        <a href="{% url 'add_spotify_content' %}" class="ajax-link" data-target-url="{% url 'add_spotify_content' %}">Add from Spotify URL</a> |
+        <a href="{% url 'browse_songs' %}" class="ajax-link" data-target-url="{% url 'browse_songs' %}">Browse All Songs</a>
+    </div>
 
-            <!-- Songs Section -->
-            <h3>Songs</h3>
-            {% if user_library_songs %}
-                <ul class="item-list"> {# Use item-list class #}
-                    {% for song in user_library_songs %}
-                        <li>
-                            <span class="item-info"> {# Use item-info wrapper #}
-                                <span class="item-title">{{ song.title }}</span>
-                                <span class="item-artist">{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
-                            </span>
-                            <div class="actions"> {# Use actions wrapper #}
-                                {% if song.file %}
-                                    {# Changed to button with data attributes #}
-                                    <button type="button" class="action-button play-button"
-                                            data-song-url="{{ song.file.url }}"
-                                            data-song-title="{{ song.title }}"
-                                            data-song-artist="{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
-                                            data-song-cover="{% with release=song.get_release %}{% if release.cover_image %}{{ release.cover_image.url }}{% elif release.cover_image_url %}{{ release.cover_image_url }}{% else %}{% static 'placeholder-cover.png' %}{% endif %}{% endwith %}">
-                                        Play
-                                    </button>
-                                {% else %}
-                                    <span class="file-missing">(File missing)</span>
-                                {% endif %}
-                                {# Add remove button directly in home? Maybe later #}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                 <p class="empty-library">No songs in your library yet.</p>
-            {% endif %}
+    <!-- Library Sections -->
+    <div class="library-section">
+        <h2>Your Library</h2>
 
-            <!-- Albums Section -->
-            <h3>Albums</h3> {# Removed inline style #}
-            {% if user_library_albums %}
-                <ul class="item-list"> {# Use item-list class #}
-                    {% for album in user_library_albums %}
-                        <li>
-                            <span class="item-info"> {# Use item-info wrapper #}
-                                {# Link the album title #}
-                                <a href="{% url 'album_detail' album.id %}" class="detail-link item-title">{{ album.title }}</a>
-                                <span class="item-artist">{{ album.artists.first.name }}{% if album.artists.count > 1 %} et al.{% endif %}</span>
-                            </span>
-                            {# No actions needed here for now #}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                 <p class="empty-library">No albums in your library yet.</p>
-            {% endif %}
+        <!-- Songs Section (Aggregated) -->
+        <h3>Songs (from your library releases)</h3>
+        {% if user_library_songs %}
+            <ul class="item-list">
+                {% for song in user_library_songs %}
+                    <li>
+                        <span class="item-info">
+                            <span class="item-title">{{ song.title }}</span>
+                            <span class="item-artist">{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+                        </span>
+                        <div class="actions">
+                            {% if song.file %}
+                                <button type="button" class="action-button play-button"
+                                        data-song-url="{{ song.file.url }}"
+                                        data-song-title="{{ song.title }}"
+                                        data-song-artist="{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                                        data-song-cover="{% with release=song.get_release %}{% if release.cover_image %}{{ release.cover_image.url }}{% elif release.cover_image_url %}{{ release.cover_image_url }}{% else %}{% static 'placeholder-cover.png' %}{% endif %}{% endwith %}"
+                                        data-song-id="{{ song.id }}">
+                                    Play
+                                </button>
+                                <button type="button" class="action-button add-queue-button" data-song-id="{{ song.id }}">
+                                    <i class="fa-solid fa-list-ul"></i>
+                                </button>
+                            {% else %}
+                                <span class="file-missing">(File missing)</span>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+             <p class="empty-library">Add some Albums, EPs, or Singles to see songs here.</p>
+        {% endif %}
 
-            <!-- Artists Section -->
-            <h3>Artists</h3> {# Removed inline style #}
-            {% if user_library_artists %}
-                <ul class="item-list"> {# Use item-list class #}
-                    {% for artist in user_library_artists %}
-                        <li>
-                            <span class="item-info"> {# Use item-info wrapper #}
-                                <a href="#" class="detail-link item-title">{{ artist.name }}</a> {# Placeholder link #}
-                            </span>
-                             {# No actions needed here for now #}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                 <p class="empty-library">No artists in your library yet.</p>
-            {% endif %}
+        <!-- Albums Section -->
+        {% if user_library_albums %}
+            <ul class="item-list">
+                {% for album in user_library_albums %}
+                    <li>
+                        <span class="item-info">
+                            {# Update album link for AJAX #}
+                            <a href="{% url 'album_detail' album.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'album_detail' album.id %}">{{ album.title }}</a>
+                            <span class="item-artist">{{ album.artists.first.name }}{% if album.artists.count > 1 %} et al.{% endif %}</span>
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+             <p class="empty-library">No albums in your library yet.</p>
+        {% endif %}
 
-            <!-- Playlists Section -->
-            <h3>Your Playlists</h3> {# Removed inline style #}
-            {% if user_library_playlists %}
-                <ul class="item-list"> {# Use item-list class #}
-                    {% for playlist in user_library_playlists %}
-                        <li>
-                            <span class="item-info"> {# Use item-info wrapper #}
-                                <a href="#" class="detail-link item-title">{{ playlist.name }}</a> {# Placeholder link #}
-                                <span class="item-meta">({{ playlist.songs.count }} song{{ playlist.songs.count|pluralize }})</span>
-                            </span>
-                            {# No actions needed here for now #}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                 <p class="empty-library">You haven't created any playlists yet.</p>
-            {% endif %}
+        <!-- EPs Section -->
+        <h3>EPs</h3>
+        {% if user_library_eps %}
+            <ul class="item-list">
+                {% for ep in user_library_eps %}
+                    <li>
+                        <span class="item-info">
+                            {# TODO: Update EP link for AJAX if EP detail page exists #}
+                            <span class="item-title">{{ ep.title }}</span>
+                            <span class="item-artist">{{ ep.artists.first.name }}{% if ep.artists.count > 1 %} et al.{% endif %}</span>
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+             <p class="empty-library">No EPs in your library yet.</p>
+        {% endif %}
 
-        </div> <!-- End library-section -->
+        <!-- Singles Section -->
+        <h3>Singles</h3>
+        {% if user_library_singles %}
+            <ul class="item-list">
+                {% for single in user_library_singles %}
+                    <li>
+                        <span class="item-info">
+                             {# TODO: Update Single link for AJAX if Single detail page exists #}
+                            <span class="item-title">{{ single.title }}</span>
+                            <span class="item-artist">{{ single.artists.first.name }}{% if single.artists.count > 1 %} et al.{% endif %}</span>
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+             <p class="empty-library">No singles in your library yet.</p>
+        {% endif %}
 
+        <!-- Artists Section -->
+        <h3>Artists</h3>
+        {% if user_library_artists %}
+            <ul class="item-list">
+                {% for artist in user_library_artists %}
+                    <li>
+                        <span class="item-info">
+                            {# TODO: Update Artist link for AJAX if Artist detail page exists #}
+                            <a href="#" class="detail-link item-title">{{ artist.name }}</a>
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+             <p class="empty-library">No artists in your library yet.</p>
+        {% endif %}
 
-        <form action="{% url 'logout' %}" method="post" class="logout-form"> {# Use logout-form class #}
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
+        <!-- Playlists Section -->
+        <h3>Your Playlists</h3>
+        {% if user_library_playlists %}
+            <ul class="item-list">
+                {% for playlist in user_library_playlists %}
+                    <li>
+                        <span class="item-info">
+                            {# TODO: Update Playlist link for AJAX if Playlist detail page exists #}
+                            <a href="#" class="detail-link item-title">{{ playlist.name }}</a>
+                            <span class="item-meta">({{ playlist.songs.count }} song{{ playlist.songs.count|pluralize }})</span>
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+             <p class="empty-library">You haven't created any playlists yet.</p>
+        {% endif %}
 
-        <!-- Audio Player -->
-        <div class="audio-player-container">
-            {# Player Cover Art - src is handled by JS #}
-            <img id="player-cover-art" src="{% static 'placeholder-cover.png' %}" alt="Cover Art" class="player-cover">
+    </div> <!-- End library-section -->
 
-            <div class="current-track-info">
-                <span id="current-track-title">No track selected</span>
-                <span id="current-track-artist"></span>
-            </div>
-
-            <div class="player-controls">
-                <button id="play-pause-button" class="control-button">
-                    <i id="play-icon" class="fa-solid fa-play"></i>
-                    <i id="pause-icon" class="fa-solid fa-pause" style="display: none;"></i>
-                </button>
-                <span id="current-time" class="time-display">0:00</span>
-                <input type="range" id="seek-bar" value="0" step="0.1" class="seek-bar">
-                <span id="duration" class="time-display">0:00</span>
-            </div>
-
-            <div class="volume-control">
-                 {# Updated Volume Icon Container with Font Awesome #}
-                 <div class="volume-icon-container">
-                     <i id="volume-mute-icon" class="fa-solid fa-volume-xmark"></i>
-                     <i id="volume-low-icon" class="fa-solid fa-volume-low"></i>
-                     <i id="volume-high-icon" class="fa-solid fa-volume-high active"></i>
-                 </div>
-                 <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="0.8" class="volume-bar">
-            </div>
-
-            {# Hidden actual audio element #}
-            <audio id="audio-player" preload="metadata"></audio>
-        </div>
-
-        {# Link the JavaScript file at the end of the body #}
-        <script src="{% static 'player.js' %}"></script>
-    </body>
-</html>
+    {# Logout form remains outside main content, but should still work #}
+    <form action="{% url 'logout' %}" method="post" class="logout-form">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+{% endblock %}

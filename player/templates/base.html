@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {# Use block title for page-specific titles #}
+    <title>{% block title %}Music Player{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% block extra_head %}{% endblock %} {# For page-specific styles/scripts in head #}
+</head>
+<body>
+
+    {# Main content area - will be replaced by AJAX #}
+    <div id="main-content">
+        {% block content %}
+        {# Page-specific content goes here #}
+        {% endblock %}
+    </div>
+
+    {# --- Persistent Audio Player --- #}
+    <div class="audio-player-container">
+        <img id="player-cover-art" src="{% static 'placeholder-cover.png' %}" alt="Cover Art" class="player-cover">
+        <div class="current-track-info">
+            <span id="current-track-title">No track selected</span>
+            <span id="current-track-artist"></span>
+        </div>
+        <div class="player-controls">
+            {# Previous Button #}
+            <button id="previous-button" class="control-button">
+                <i class="fa-solid fa-backward-step"></i>
+            </button>
+            {# Play/Pause Button #}
+            <button id="play-pause-button" class="control-button">
+                <i id="play-icon" class="fa-solid fa-play"></i>
+                <i id="pause-icon" class="fa-solid fa-pause" style="display: none;"></i>
+            </button>
+            {# Next Button #}
+            <button id="next-button" class="control-button">
+                <i class="fa-solid fa-forward-step"></i>
+            </button>
+            <span id="current-time" class="time-display">0:00</span>
+            <input type="range" id="seek-bar" value="0" step="0.1" class="seek-bar">
+            <span id="duration" class="time-display">0:00</span>
+        </div>
+        <div class="volume-control">
+             <div class="volume-icon-container">
+                 <i id="volume-mute-icon" class="fa-solid fa-volume-xmark"></i>
+                 <i id="volume-low-icon" class="fa-solid fa-volume-low"></i>
+                 <i id="volume-high-icon" class="fa-solid fa-volume-high active"></i>
+             </div>
+             <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="0.8" class="volume-bar">
+             {# Show Queue Button #}
+             <button id="show-queue-button" class="control-button queue-toggle-button">
+                 <i class="fa-solid fa-list-ol"></i>
+             </button>
+        </div>
+        <audio id="audio-player" preload="metadata"></audio>
+    </div>
+    {# --- End Persistent Audio Player --- #}
+
+    {# --- Queue Modal --- #}
+    <div id="queue-modal" class="queue-modal-container" style="display: none;">
+        <div class="queue-modal-content">
+            <button id="close-queue-button" class="close-button">&times;</button>
+            <h2>Playback Queue</h2>
+            <ul id="queue-list" class="item-list">
+                {# Queue items will be loaded here by JS #}
+                <li class="loading-placeholder">Loading queue...</li>
+            </ul>
+        </div>
+    </div>
+    {# --- End Queue Modal --- #}
+
+    {# Link the JavaScript file at the end of the body #}
+    <script src="{% static 'player.js' %}"></script>
+    {% block extra_scripts %}{% endblock %} {# For page-specific scripts at end of body #}
+</body>
+</html>

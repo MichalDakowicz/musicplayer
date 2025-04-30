@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import os # Add os import
+from django.utils import timezone # Import timezone
 
 # Create your models here.
 class Artist(models.Model):
@@ -115,7 +116,6 @@ class Library(models.Model):
     eps = models.ManyToManyField(EP, related_name='libraries', blank=True)
     singles = models.ManyToManyField(Single, related_name='libraries', blank=True)
     playlists = models.ManyToManyField(Playlist, related_name='libraries', blank=True)
-    songs = models.ManyToManyField(Song, related_name='libraries', blank=True) # Added songs relationship
 
     def __str__(self):
         return f"{self.user.username}'s Library"
@@ -123,19 +123,54 @@ class Library(models.Model):
     class Meta:
         verbose_name_plural = "Libraries"
 
-# Signal to create Library for new User
+class Queue(models.Model):
+    """Represents a user's playback queue."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='queue')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    # current_track_index is now the order of the *next* track to play if queue continues
+    current_track_index = models.IntegerField(default=0, help_text="Order of the next track to be played from the queue.")
+    # Add field to track the order of the song that is *currently* playing or was *last* played
+    currently_playing_order = models.IntegerField(default=0, help_text="Order of the track currently playing or last played from the queue.")
+
+    def __str__(self):
+        return f"{self.user.username}'s Queue"
+
+    class Meta:
+        verbose_name_plural = "Queues"
+
+class QueueItem(models.Model):
+    """An individual item in a user's queue, maintaining order."""
+    queue = models.ForeignKey(Queue, on_delete=models.CASCADE, related_name='items')
+    song = models.ForeignKey(Song, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField()
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order'] # Ensure items are ordered correctly by default
+        unique_together = ('queue', 'order') # Prevent duplicate order numbers within a queue
+
+    def __str__(self):
+        return f"Order {self.order}: {self.song.title} in {self.queue}"
+
+
+# Signal to create Library and Queue for new User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 @receiver(post_save, sender=User)
-def create_user_library(sender, instance, created, **kwargs):
+def create_user_profile_items(sender, instance, created, **kwargs):
     if created:
-        Library.objects.create(user=instance)
+        Library.objects.get_or_create(user=instance) # Use get_or_create for safety
+        Queue.objects.get_or_create(user=instance) # Create queue as well
 
 @receiver(post_save, sender=User)
-def save_user_library(sender, instance, **kwargs):
+def save_user_profile_items(sender, instance, **kwargs):
     try:
         instance.library.save()
     except Library.DoesNotExist:
-        # Handle case where library might not exist yet (though create_user_library should handle it)
-        Library.objects.create(user=instance)
+        Library.objects.get_or_create(user=instance)
+    try:
+        instance.queue.save()
+    except Queue.DoesNotExist:
+        Queue.objects.get_or_create(user=instance)

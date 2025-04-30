@@ -330,6 +330,30 @@ a:hover {
     border-color: #777;
 }
 
+/* Add to Queue Button Style */
+.action-button.add-queue-button {
+    background-color: transparent;
+    color: #b3b3b3; /* Grey icon */
+    border: 1px solid #555; /* Subtle border */
+    padding: 5px 8px; /* Adjust padding for icon */
+    margin-left: 8px; /* Space from play button */
+}
+
+.action-button.add-queue-button i {
+    font-size: 0.9em; /* Adjust icon size */
+}
+
+.action-button.add-queue-button:hover {
+    background-color: #333;
+    color: #ffffff;
+    border-color: #777;
+}
+
+.action-button.add-queue-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .file-missing {
     color: #aaa;
     font-style: italic;
@@ -482,6 +506,11 @@ a:hover {
     font-size: 32px;
 }
 
+/* Previous/Next Buttons */
+#previous-button i,
+#next-button i {
+    font-size: 20px; /* Slightly smaller than play/pause */
+}
 
 .time-display {
     color: #b3b3b3;
@@ -582,7 +611,7 @@ input[type="range"].volume-bar:hover {
     display: flex;
     align-items: center;
     flex-shrink: 0; /* Prevent shrinking */
-    min-width: 150px; /* Increased min-width to fit icon */
+    min-width: 180px; /* Increase min-width slightly to accommodate queue button */
     justify-content: flex-end; /* Align volume slider to the right */
 }
 
@@ -610,4 +639,188 @@ input[type="range"].volume-bar:hover {
 
 .volume-icon-container:hover {
     color: #ffffff; /* White on hover */
+}
+
+/* Queue Toggle Button in Volume Control */
+.queue-toggle-button {
+    margin-left: 10px; /* Space between volume slider and queue button */
+    padding: 5px;
+}
+.queue-toggle-button i {
+    font-size: 18px; /* Adjust icon size */
+}
+
+/* Queue Modal Styles - MODIFIED for positioning and display */
+.queue-modal-container {
+    position: fixed;
+    bottom: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    z-index: 1100;
+    /* Use display: none initially instead of visibility/opacity */
+    display: none;
+    opacity: 0; /* Keep opacity for transition */
+    transition: opacity 0.3s ease, bottom 0.3s ease; /* Adjust transition */
+    pointer-events: none;
+}
+
+.queue-modal-container.visible {
+    /* Set display to flex (or block) when visible */
+    display: flex; /* Use flex to easily center content vertically if needed later */
+    flex-direction: column; /* Stack content vertically */
+    align-items: center; /* Center content horizontally */
+    opacity: 1;
+    /* visibility: visible; Removed, using display now */
+    bottom: 85px;
+    /* transition: opacity 0.3s ease, bottom 0.3s ease; Removed duplicate */
+    pointer-events: auto;
+}
+
+.queue-modal-content {
+    background-color: #282828;
+    padding: 15px 20px;
+    border-radius: 8px;
+    max-height: 40vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.4);
+    /* Ensure content takes appropriate width within the flex container */
+    width: 100%; /* Let content fill the container width */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.queue-modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 15px; /* Reduced margin */
+    font-size: 1.1em; /* Slightly smaller heading */
+    color: #ffffff;
+    text-align: center;
+    border-bottom: none;
+}
+
+.queue-modal-content .close-button {
+    position: absolute;
+    top: 8px; /* Adjusted position */
+    right: 10px; /* Adjusted position */
+    background: none;
+    border: none;
+    font-size: 24px; /* Slightly smaller */
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.queue-modal-content .close-button:hover {
+    color: #fff;
+}
+
+/* Queue List Styling within Modal */
+#queue-list {
+    margin-top: 15px;
+    padding: 0; /* Remove default padding */
+    list-style: none; /* Remove default list style */
+}
+
+/* Style for section headers */
+.queue-section-header {
+    background-color: #333; /* Slightly different background */
+    color: #ccc;
+    font-weight: bold;
+    font-size: 0.8em;
+    padding: 8px 10px;
+    margin-top: 10px; /* Space above headers */
+    margin-bottom: 5px; /* Space below headers */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 3px;
+    /* Ensure it doesn't look like a playable item */
+    cursor: default;
+}
+.queue-section-header:first-child {
+    margin-top: 0; /* No top margin for the very first header */
+}
+
+#queue-list li:not(.queue-section-header) { /* Apply item styles only to non-header li */
+    /* Inherits from .item-list li */
+    padding: 10px 5px; /* Slightly less padding */
+    background-color: transparent; /* Ensure no background initially */
+    border-radius: 0; /* Remove rounding inside modal list */
+    /* Ensure flex properties are set if not inherited */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #282828; /* Add separator back */
+}
+#queue-list li:not(.queue-section-header):hover {
+     background-color: #3a3a3a; /* Different hover for modal */
+}
+#queue-list li:last-child:not(.queue-section-header) {
+    border-bottom: none; /* Remove border from last actual item */
+}
+
+
+#queue-list .item-info {
+    /* Inherits */
+    flex-grow: 1; /* Ensure info takes up space */
+    margin-right: 10px; /* Space before actions */
+}
+#queue-list .item-title {
+    /* Inherits */
+    font-size: 0.95em;
+}
+#queue-list .item-artist {
+    /* Inherits */
+    font-size: 0.8em;
+}
+
+/* Actions within queue list */
+#queue-list .actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Style for the remove button in the queue */
+#queue-list .remove-queue-button {
+    background: none;
+    border: none;
+    color: #888; /* Dim color */
+    cursor: pointer;
+    padding: 3px 6px; /* Small padding */
+    margin-left: 8px; /* Space from other potential actions */
+    font-size: 1.1em; /* Adjust size */
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+#queue-list .remove-queue-button:hover {
+    color: #eee; /* Brighter on hover */
+}
+
+/* Highlight currently playing/next track */
+#queue-list li.is-playing .item-title,
+#queue-list li.is-playing .item-artist {
+    color: #1DB954; /* Spotify green for playing track */
+    font-weight: bold;
+}
+/* Remove is-next styling if sections make it redundant */
+/*
+#queue-list li.is-next .item-title {
+    color: #ddd;
+}
+*/
+
+#queue-list .loading-placeholder,
+#queue-list .empty-queue {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-style: italic;
+    border-bottom: none;
+}
+#queue-list .empty-queue:hover {
+    background-color: transparent; /* No hover effect */
 }

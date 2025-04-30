@@ -1,51 +1,35 @@
-<!-- filepath: c:\Users\MSI\OneDrive\Pulpit\GitHub Repos\musicplayer\player\templates\add_spotify_content.html -->
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add from Spotify</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
+
+{% block title %}Add from Spotify - Music Player{% endblock %}
+
+{% block content %}
     <h1>Add Track/Album/Playlist from Spotify URL</h1>
 
-    {# Display general errors from form validation if any #}
+    {# Display errors/logs #}
     {% if form.non_field_errors %}
-        <div class="error">
-            {% for error in form.non_field_errors %}
-                <p>{{ error }}</p>
-            {% endfor %}
-        </div>
+        <div class="error">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
     {% endif %}
-    {% if form.url.errors %} {# Display URL specific errors #}
-         <div class="error">
-             {% for error in form.url.errors %}
-                 <p>{{ error }}</p>
-             {% endfor %}
-         </div>
+    {% if form.url.errors %}
+         <div class="error">{% for error in form.url.errors %}<p>{{ error }}</p>{% endfor %}</div>
     {% endif %}
-
-    {# Display processing logs #}
     {% if logs %}
         <div class="logs-container">
             <h3>Processing Logs:</h3>
-            {% for log_message in logs %}
-                <p>{{ log_message }}</p>
-            {% endfor %}
+            {% for log_message in logs %}<p>{{ log_message }}</p>{% endfor %}
         </div>
     {% endif %}
 
+    {# Forms submitted via AJAX need special handling, but standard POST might still work initially #}
+    {# For full SPA feel, form submission should also be via AJAX #}
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }} {# Renders fields within <p> tags #}
+        {{ form.as_p }}
         <button type="submit">Add and Download</button>
     </form>
 
-    <div class="back-link"> {# Use div for consistency #}
-        <a href="{% url 'home' %}">Back to Home</a>
+    <div class="back-link">
+        {# Update link for AJAX #}
+        <a href="{% url 'home' %}" class="ajax-link" data-target-url="{% url 'home' %}">Back to Home</a>
     </div>
-
-</body>
-</html>
+{% endblock %}
