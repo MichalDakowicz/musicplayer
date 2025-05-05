@@ -1,210 +1,187 @@
-body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Modern font */
-    margin: 0;
-    /* Increased bottom padding to ensure content doesn't hide behind player */
-    padding: 20px 40px 90px 40px; /* Adjusted padding, increased bottom */
-    background-color: #121212; /* Dark background */
-    color: #e0e0e0; /* Light text */
-    display: flex; /* Enable flexbox for centering */
-    flex-direction: column; /* Stack items vertically */
-    align-items: center; /* Center items horizontally */
-    min-height: 100vh; /* Ensure body takes full viewport height */
-    box-sizing: border-box; /* Ensure padding is included in height */
+/* --- Spotify Color Palette & Variables --- */
+:root {
+    --spotify-green: #1DB954;
+    --spotify-green-light: #1ED760;
+    --spotify-black: #121212;
+    --spotify-dark-grey: #181818;
+    --spotify-medium-grey: #282828;
+    --spotify-light-grey: #535353;
+    --spotify-text-grey: #b3b3b3;
+    --spotify-text-white: #ffffff;
+    --spotify-highlight-bg: rgba(255, 255, 255, 0.1);
+    --player-height: 80px; /* Define player height as variable */
 }
 
-/* Remove or comment out the .container rule */
-/*
-.container {
-    max-width: 500px;
-    margin: 40px auto;
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+/* --- Base Styles --- */
+body {
+    font-family: 'CircularSp', 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Spotify font stack (approx) */
+    margin: 0;
+    /* Adjust padding to account for fixed player */
+    padding: 20px 40px var(--player-height) 40px;
+    background-color: var(--spotify-black);
+    color: var(--spotify-text-grey);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
 }
-*/
+
+/* --- Typography --- */
+h1, h2, h3 {
+    color: var(--spotify-text-white);
+    width: 100%;
+    max-width: 900px; /* Wider content area */
+    text-align: left; /* Align headings left */
+    font-weight: 700; /* Bold headings */
+}
 
 h1 {
-    text-align: center;
-    color: #ffffff; /* White heading */
-    width: 100%; /* Ensure h1 takes width for centering */
-    max-width: 700px; /* Wider max-width for content areas */
-    margin-bottom: 30px; /* More space below main heading */
-    font-weight: 700; /* Bolder heading */
+    font-size: 2em;
+    margin-bottom: 30px;
 }
 
 h2 {
-    color: #ffffff;
-    border-bottom: 1px solid #333;
+    font-size: 1.5em;
+    border-bottom: 1px solid var(--spotify-medium-grey);
     padding-bottom: 10px;
     margin-top: 40px;
     margin-bottom: 20px;
-    width: 100%;
-    max-width: 700px;
-    font-weight: 600; /* Slightly bolder sub-heading */
 }
 
 h3 {
-    color: #b3b3b3;
+    font-size: 1.1em;
+    color: var(--spotify-text-white); /* Make H3 white too */
     margin-top: 30px;
     margin-bottom: 15px;
-    width: 100%;
-    max-width: 700px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
-
-form { /* Center form and limit its width, but remove container look */
+p {
+    text-align: left; /* Align paragraphs left */
     width: 100%;
-    max-width: 400px; /* Adjust as needed */
-    margin: 20px 0; /* Add some vertical margin */
+    max-width: 900px;
+    color: var(--spotify-text-grey);
+    line-height: 1.6;
+}
+
+a {
+    color: var(--spotify-text-white); /* White links by default */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--spotify-green); /* Green on hover */
+    text-decoration: underline;
+}
+
+/* --- Forms --- */
+form {
+    width: 100%;
+    max-width: 450px;
+    margin: 30px 0;
     box-sizing: border-box;
-    /* Removed background/border for non-container look */
-    background-color: #181818; /* Slightly lighter form background */
-    padding: 25px; /* Slightly more padding */
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-}
-
-/* Specific styling for login/register forms */
-form#login-form, form#register-form {
-    background-color: #181818;
+    background-color: var(--spotify-dark-grey);
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-
-form label,
-form input,
-form button {
+form label {
     display: block;
-    width: 100%; /* Inputs/button take full width of form */
-    margin-bottom: 15px;
-    box-sizing: border-box; /* Include padding/border in width */
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--spotify-text-white);
+    font-size: 0.9em;
 }
 
 form input[type="text"],
 form input[type="email"],
 form input[type="password"],
-form input[type="url"] { /* Added url type */
-    padding: 12px 15px; /* Slightly larger padding */
-    border: 1px solid #555; /* Darker border */
+form input[type="url"] {
+    padding: 14px 16px;
+    border: 1px solid transparent; /* No border by default */
     border-radius: 4px;
-    background-color: #333; /* Dark input background */
-    color: #e0e0e0; /* Light input text */
+    background-color: var(--spotify-light-grey); /* Slightly lighter input bg */
+    color: var (--spotify-text-white);
     font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
-/* Focus style for inputs */
 form input[type="text"]:focus,
 form input[type="email"]:focus,
 form input[type="password"]:focus,
 form input[type="url"]:focus {
     outline: none;
-    border-color: #1DB954; /* Highlight border on focus */
-    box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3); /* Subtle glow */
+    background-color: var(--spotify-medium-grey); /* Darker on focus */
+    border-color: var(--spotify-text-grey); /* Subtle border on focus */
+    box-shadow: none;
 }
 
-
-/* Add placeholder color */
 form input::placeholder {
-    color: #888;
+    color: var(--spotify-text-grey);
+    opacity: 0.8;
 }
-
 
 form button {
-    padding: 12px 15px; /* Consistent padding */
-    background-color: #1DB954; /* Spotify green */
-    color: white;
+    padding: 14px 20px;
+    background-color: var(--spotify-green);
+    color: var(--spotify-black); /* Black text on green button */
     border: none;
-    border-radius: 50px; /* Pill shape */
+    border-radius: 50px;
     cursor: pointer;
-    font-size: 1rem; /* Consistent font size */
-    font-weight: bold;
+    font-size: 1rem;
+    font-weight: 700; /* Bolder button text */
     text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: background-color 0.2s ease, transform 0.1s ease; /* Added transform transition */
+    letter-spacing: 1.5px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px; /* Space above button */
 }
 
 form button:hover {
-    background-color: #1ED760; /* Lighter green on hover */
+    background-color: var(--spotify-green-light);
+    transform: scale(1.02); /* Slightly enlarge on hover */
 }
-/* Add active state for button press */
 form button:active {
-    transform: scale(0.98); /* Slightly shrink on press */
+    transform: scale(0.98);
 }
-
 
 /* Style for Django form paragraph elements */
 form p {
     margin-bottom: 15px;
 }
 
-form p label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #e0e0e0; /* Ensure label text is light */
-}
-
-form p input {
-    width: 100%; /* Match other inputs */
-    padding: 12px 15px; /* Consistent padding */
-    border: 1px solid #555; /* Darker border */
-    border-radius: 4px;
-    background-color: #333; /* Dark input background */
-    color: #e0e0e0; /* Light input text */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    font-size: 1rem; /* Consistent font size */
-}
-/* Focus style for Django form inputs */
-form p input:focus {
-    outline: none;
-    border-color: #1DB954;
-    box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3);
-}
-
-/* General paragraph styling */
-p {
-    text-align: center;
-    width: 100%;
-    max-width: 700px; /* Wider max-width */
-    color: #b0b0b0; /* Slightly dimmer paragraph text */
-    line-height: 1.5;
-}
-
-a {
-    color: #1DB954; /* Spotify green for links */
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-a:hover {
-    text-decoration: none; /* Remove underline on hover */
-    color: #1ED760; /* Lighter green on hover */
-}
-
-/* Navigation Links */
+/* --- Navigation & Links --- */
 .nav-links {
     margin: 20px 0 40px 0;
-    text-align: center;
+    text-align: left; /* Align left */
     width: 100%;
-    max-width: 700px;
+    max-width: 900px;
 }
 
 .nav-links a {
-    margin: 0 15px;
+    margin-right: 25px; /* More space */
     font-weight: bold;
+    color: var(--spotify-text-grey); /* Grey nav links */
+}
+.nav-links a:hover {
+    color: var(--spotify-text-white); /* White on hover */
+    text-decoration: none;
 }
 
-/* Library Section */
+/* --- Item Lists (Songs, Albums, Artists, Playlists) --- */
 .library-section {
     width: 100%;
-    max-width: 700px;
+    max-width: 900px;
     margin-top: 20px;
 }
 
-/* Item Lists (Songs, Albums, Artists, Playlists) */
 .item-list {
     list-style: none;
     padding: 0;
@@ -212,615 +189,1035 @@ a:hover {
     width: 100%;
 }
 
-.item-list li, .song-list li { /* Apply to both list types */
+.item-list li, .song-list li {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 10px;
-    border-bottom: 1px solid #282828; /* Subtle separator */
+    padding: 10px 15px; /* Consistent padding */
+    border-bottom: none; /* Remove bottom border */
     transition: background-color 0.2s ease;
-    border-radius: 4px; /* Slight rounding */
-    min-height: 40px; /* Ensure consistent height */
+    border-radius: 4px;
+    min-height: 50px; /* Slightly taller items */
+    cursor: pointer; /* Indicate clickable rows */
 }
 
 .item-list li:hover, .song-list li:hover {
-    background-color: #2a2a2a; /* Slightly darker highlight on hover */
-}
-
-.item-list li:last-child, .song-list li:last-child {
-    border-bottom: none;
+    background-color: var(--spotify-highlight-bg); /* Use highlight variable */
 }
 
 .item-info {
     flex-grow: 1;
     margin-right: 15px;
     display: flex;
-    flex-direction: column; /* Stack title and artist */
+    flex-direction: column;
+    overflow: hidden; /* Prevent text overflow issues */
 }
 
-.item-title, .song-list li > span { /* Target song title in both list types */
-    color: #ffffff; /* White title */
+.item-title, .song-list li > span {
+    color: var(--spotify-text-white);
     font-weight: 500;
-    margin-bottom: 3px; /* Space between title and artist */
-    line-height: 1.3; /* Adjust line height */
+    margin-bottom: 3px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .item-artist, .item-meta {
-    color: #b3b3b3; /* Grey artist/meta text */
+    color: var(--spotify-text-grey);
     font-size: 0.9em;
     line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Actions within lists */
 .actions {
     display: flex;
     align-items: center;
-    flex-shrink: 0; /* Prevent actions from shrinking */
+    flex-shrink: 0;
+    opacity: 0; /* Hide actions by default */
+    transition: opacity 0.2s ease;
+}
+.item-list li:hover .actions, .song-list li:hover .actions {
+    opacity: 1; /* Show actions on row hover */
 }
 
-.actions form, .song-list li .actions form { /* Target forms in actions */
-    margin: 0 0 0 8px; /* Space between buttons/links */
+.actions form, .song-list li .actions form {
+    margin: 0 0 0 8px;
     padding: 0;
     max-width: none;
     width: auto;
-    background: none; /* Remove form background in lists */
+    background: none;
     box-shadow: none;
     border-radius: 0;
 }
 
 /* General Action Button Style */
 .action-button, .song-list li .actions button {
-    padding: 6px 12px;
-    font-size: 0.85em;
-    border-radius: 50px; /* Pill shape */
+    padding: 8px; /* Padding for icon buttons */
+    font-size: 1em; /* Reset font size */
+    border-radius: 50%; /* Circular buttons */
     cursor: pointer;
     border: none;
     font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease; /* Added transform */
-    white-space: nowrap; /* Prevent wrapping */
-    margin: 0; /* Reset margin */
-    display: inline-flex; /* Align text/icons nicely */
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    white-space: nowrap;
+    margin: 0 4px; /* Space between buttons */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    background-color: transparent; /* Transparent background */
+    color: var(--spotify-text-grey); /* Grey icon color */
+    width: 32px; /* Fixed size */
+    height: 32px;
 }
-/* Active state for action buttons */
+.action-button:hover, .song-list li .actions button:hover {
+    color: var(--spotify-text-white); /* White icon on hover */
+    transform: scale(1.1); /* Slightly enlarge icon */
+}
 .action-button:active, .song-list li .actions button:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
-
 
 /* Specific Button Styles */
-/* Play button in lists (now a button, not a link) */
 .action-button.play-button, .song-list li .actions .play-button {
-    background-color: transparent;
-    color: #1DB954;
-    border: 1px solid #b3b3b3; /* Subtle grey border */
-    margin-right: 8px; /* Space before add/remove */
-    padding: 5px 10px; /* Slightly smaller padding */
+    /* Special case: Show play button immediately on hover, make it green */
+    color: var(--spotify-text-white);
+    background-color: var(--spotify-green);
+    width: 36px; /* Slightly larger */
+    height: 36px;
+    /* Ensure it's visible immediately on hover, overriding general .actions opacity */
+    opacity: 0; /* Still hidden initially */
+}
+.item-list li:hover .action-button.play-button,
+.song-list li:hover .action-button.play-button {
+    opacity: 1; /* Show play button on hover */
 }
 .action-button.play-button:hover, .song-list li .actions .play-button:hover {
-    background-color: #1DB954;
-    color: #ffffff;
-    border-color: #1DB954; /* Green border on hover */
+    background-color: var(--spotify-green-light);
+    transform: scale(1.05); /* Different scale for play button */
 }
-
-/* Remove play-link styles as it's now play-button */
-/* .action-button.play-link, .song-list li a.play-link { ... } */
-/* .action-button.play-link:hover, .song-list li a.play-link:hover { ... } */
-
-.action-button.add-btn, .song-list li .actions .add-btn {
-    background-color: #1DB954;
-    color: white;
-    border: none; /* Ensure no border */
+/* Hide the text "Play" inside the button */
+.action-button.play-button {
+    font-size: 0; /* Hide text */
 }
-.action-button.add-btn:hover, .song-list li .actions .add-btn:hover {
-    background-color: #1ED760;
-}
-
-.action-button.remove-btn, .song-list li .actions .remove-btn {
-    background-color: transparent; /* Make remove less prominent */
-    color: #b3b3b3;
-    border: 1px solid #555; /* Subtle border */
-}
-.action-button.remove-btn:hover, .song-list li .actions .remove-btn:hover {
-    background-color: #333; /* Darker background on hover */
-    color: #ffffff;
-    border-color: #777;
-}
-
-/* Add to Queue Button Style */
-.action-button.add-queue-button {
-    background-color: transparent;
-    color: #b3b3b3; /* Grey icon */
-    border: 1px solid #555; /* Subtle border */
-    padding: 5px 8px; /* Adjust padding for icon */
-    margin-left: 8px; /* Space from play button */
+.action-button.play-button::before {
+    content: "\f04b"; /* Font Awesome play icon */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 14px; /* Adjust icon size */
+    color: var(--spotify-black); /* Black icon on green button */
 }
 
 .action-button.add-queue-button i {
-    font-size: 0.9em; /* Adjust icon size */
-}
-
-.action-button.add-queue-button:hover {
-    background-color: #333;
-    color: #ffffff;
-    border-color: #777;
-}
-
-.action-button.add-queue-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    font-size: 16px; /* Adjust icon size */
 }
 
 .file-missing {
-    color: #aaa;
+    color: var(--spotify-light-grey); /* Darker grey */
     font-style: italic;
     font-size: 0.85em;
     margin-left: 10px;
     white-space: nowrap;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
 /* Detail Links (e.g., Album/Artist names) */
 .detail-link {
-    color: #ffffff; /* White link for main items */
+    color: var(--spotify-text-white);
     font-weight: 500;
 }
 .detail-link:hover {
-    color: #1ED760; /* Spotify green on hover */
+    color: var(--spotify-text-white); /* Keep white */
+    text-decoration: underline; /* Underline on hover */
 }
 
 /* Empty Library Message */
 .empty-library {
-    color: #888;
+    color: var(--spotify-text-grey);
     font-style: italic;
-    text-align: left; /* Align with list items */
+    text-align: left;
     margin-top: 10px;
-    max-width: 700px;
+    max-width: 900px;
     width: 100%;
 }
 
 /* Logout Form/Button */
 .logout-form {
     margin-top: 40px;
-    background: none; /* No background for logout */
+    background: none;
     padding: 0;
     box-shadow: none;
-    max-width: 150px; /* Limit width */
+    max-width: 150px;
 }
-
 .logout-form button {
-    background-color: #333; /* Darker grey logout button */
+    background-color: transparent;
+    border: 1px solid var(--spotify-light-grey);
+    color: var(--spotify-text-white);
     font-size: 0.9em;
-    color: #b3b3b3;
+    padding: 8px 16px;
+    width: auto; /* Don't force full width */
 }
 .logout-form button:hover {
-    background-color: #555;
-    color: #ffffff;
-}
-.logout-form button:active {
-    transform: scale(0.98);
+    border-color: var(--spotify-text-white);
+    transform: scale(1.02);
 }
 
-/* Audio Player Styles */
+/* --- Audio Player Styles --- */
 .audio-player-container {
-    position: fixed; /* Keep player fixed at the bottom */
+    position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #181818; /* Slightly lighter dark background */
-    padding: 0 15px; /* Adjusted padding */
+    background-color: var(--spotify-dark-grey);
+    padding: 0 16px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+    display: grid; /* Use grid for layout */
+    grid-template-columns: minmax(180px, 1fr) minmax(300px, 2fr) minmax(180px, 1fr); /* Min widths, flexible distribution */
+    align-items: center;
+    box-sizing: border-box;
+    z-index: 1000;
+    height: var(--player-height);
+    border-top: 1px solid var(--spotify-medium-grey);
+    gap: 16px; /* Add gap between grid columns */
+}
+
+/* Left side: Cover + Track Info */
+.player-left {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Space out info and controls */
-    box-sizing: border-box;
-    z-index: 1000; /* Ensure it's above other content */
-    height: 75px; /* Slightly increased fixed height for the player bar */
-    border-top: 1px solid #282828; /* Subtle top border */
+    overflow: hidden; /* Prevent overflow */
 }
-
-/* New style for player cover art */
 .player-cover {
-    height: 50px; /* Adjust size as needed */
-    width: 50px;
+    height: 56px;
+    width: 56px;
     object-fit: cover;
     border-radius: 4px;
-    margin-right: 15px; /* Space between cover and track info */
-    background-color: #333; /* Placeholder background */
-    flex-shrink: 0; /* Prevent shrinking */
+    margin-right: 14px;
+    background-color: var(--spotify-medium-grey);
+    flex-shrink: 0;
 }
-
-
 .current-track-info {
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Center vertically */
-    color: #e0e0e0;
-    margin-right: 15px; /* Adjusted margin */
+    justify-content: center;
+    color: var(--spotify-text-grey);
     text-align: left;
-    min-width: 100px; /* Adjusted min-width */
-    max-width: 200px; /* Adjusted max-width */
-    flex-shrink: 1; /* Allow shrinking if needed */
-    overflow: hidden; /* Hide overflow */
-    white-space: nowrap; /* Prevent wrapping */
+    flex-grow: 1; /* Allow shrinking/growing */
+    overflow: hidden;
+    margin: 0; /* Reset margin */
 }
 #current-track-title {
     font-weight: 500;
-    color: #ffffff;
+    color: var(--spotify-text-white);
     overflow: hidden;
-    text-overflow: ellipsis; /* Add ellipsis if title is too long */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9em;
+    line-height: 1.3; /* Add line-height */
 }
 #current-track-artist {
-    font-size: 0.85em;
-    color: #b3b3b3;
+    font-size: 0.75em; /* Smaller artist text */
+    color: var(--spotify-text-grey);
     overflow: hidden;
-    text-overflow: ellipsis; /* Add ellipsis if artist is too long */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.3; /* Add line-height */
 }
 
-
-/* Remove default audio player styling */
-#audio-player {
-    display: none; /* Hide the default player */
+/* Center: Player Controls + Seek Bar */
+.player-center {
+    display: flex;
+    flex-direction: column; /* Stack controls and seek bar */
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Take full width of grid cell */
+    overflow: hidden; /* Prevent overflow */
 }
-
-
-/* Custom Player Controls */
 .player-controls {
     display: flex;
     align-items: center;
-    justify-content: center; /* Center controls horizontally */
-    flex-grow: 1; /* Allow controls to take up space */
-    margin: 0 15px; /* Adjusted spacing */
-    min-width: 200px; /* Adjusted min-width */
+    justify-content: center;
+    width: auto; /* Let buttons determine width */
+    margin-bottom: 8px; /* Space between controls and seek bar */
+    flex-shrink: 0; /* Prevent controls shrinking */
 }
-
 .control-button {
     background: none;
     border: none;
-    color: #b3b3b3;
+    color: var(--spotify-text-grey);
     cursor: pointer;
-    padding: 5px;
-    margin: 0 10px; /* Space around buttons */
-    display: flex; /* Align icon */
+    padding: 0;
+    margin: 0 12px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.2s ease, transform 0.1s ease; /* Added transform */
+    transition: color 0.2s ease, transform 0.1s ease;
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    flex-shrink: 0; /* Prevent buttons shrinking */
 }
-
 .control-button i {
-    font-size: 24px; /* Size of play/pause icons */
-    fill: currentColor; /* Use button color */
+    font-size: 18px; /* Smaller icons for prev/next */
+    line-height: 1; /* Ensure icon vertical alignment */
+    margin: 0;
+    padding: 0;
+    display: block; /* Ensure icon behaves like a block */
 }
-
 .control-button:hover {
-    color: #ffffff; /* White on hover */
+    color: var(--spotify-text-white);
 }
 .control-button:active {
-    transform: scale(0.95); /* Slightly shrink icon on press */
+    transform: scale(0.95);
 }
-
-/* Make main play/pause button larger */
+#play-pause-button {
+    background-color: var(--spotify-text-white);
+    color: var(--spotify-black);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    margin: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+    vertical-align: middle;
+    flex-shrink: 0; /* Prevent button shrinking */
+}
 #play-pause-button i {
-    font-size: 32px;
+    font-size: 16px; /* Adjust icon size within circle */
+    line-height: 1; /* Ensure icon vertical alignment */
+    margin: 0;
+    padding: 0;
+    display: block; /* Ensure icon behaves like a block */
+}
+#play-pause-button:hover {
+    transform: scale(1.06); /* Enlarge circle on hover */
+    background-color: var(--spotify-text-white); /* Keep white */
+    color: var(--spotify-black); /* Keep black */
 }
 
-/* Previous/Next Buttons */
-#previous-button i,
-#next-button i {
-    font-size: 20px; /* Slightly smaller than play/pause */
+.seek-control {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 600px; /* Slightly larger max-width */
+    gap: 8px; /* Add gap between time/slider */
 }
-
 .time-display {
-    color: #b3b3b3;
-    font-size: 0.8em;
-    min-width: 40px; /* Prevent layout shifts, slightly wider */
+    color: var(--spotify-text-grey);
+    font-size: 0.75em;
+    min-width: 40px;
     text-align: center;
+    flex-shrink: 0; /* Prevent time shrinking */
 }
 
 /* Slider Styles (Seek and Volume) */
 input[type="range"].seek-bar,
 input[type="range"].volume-bar {
-    -webkit-appearance: none; /* Override default look */
+    -webkit-appearance: none;
     appearance: none;
-    height: 4px; /* Track height */
-    background: #4d4d4d; /* Slightly lighter track background */
+    height: 4px;
+    /* --- MODIFICATION START: Use gradient for progress --- */
+    /* background: var(--spotify-light-grey); */ /* Remove simple background */
+    background: linear-gradient(to right,
+        var(--progress-color, var(--spotify-text-white)) 0%,
+        var(--progress-color, var(--spotify-text-white)) var(--seek-progress, 0%), /* Use --seek-progress for seek bar */
+        var(--spotify-light-grey) var(--seek-progress, 0%),
+        var(--spotify-light-grey) 100%);
+    /* --- MODIFICATION END --- */
     border-radius: 2px;
     cursor: pointer;
-    margin: 0 10px; /* Space around sliders */
-    outline: none; /* Remove default outline */
-    transition: background 0.2s ease; /* Smooth background transition */
+    margin: 0;
+    outline: none;
+    position: relative;
+    /* overflow: hidden; */ /* Remove overflow hidden if it interferes with thumb */
+    --seek-progress: 0%; /* Default progress for seek bar */
+    --volume-progress: 80%; /* Default progress for volume bar */
+    --progress-color: var(--spotify-text-white); /* Default progress color */
+    --thumb-color: var(--spotify-text-white);
+    transition: background 0.2s ease; /* Keep transition */
+    flex-grow: 1;
+    min-width: 50px; /* Prevent excessive shrinking */
 }
-/* Style the track fill (progress) - Webkit */
+/* --- MODIFICATION START: Specific gradient for volume bar --- */
+input[type="range"].volume-bar {
+    background: linear-gradient(to right,
+        var(--progress-color, var(--spotify-text-white)) 0%,
+        var(--progress-color, var(--spotify-text-white)) var(--volume-progress, 80%), /* Use --volume-progress for volume bar */
+        var(--spotify-light-grey) var(--volume-progress, 80%),
+        var(--spotify-light-grey) 100%);
+}
+/* --- MODIFICATION END --- */
+
+/* Webkit */
 input[type="range"].seek-bar::-webkit-slider-runnable-track,
 input[type="range"].volume-bar::-webkit-slider-runnable-track {
     height: 4px;
-    background: #4d4d4d;
     border-radius: 2px;
+    background: none; /* Track background is now handled by the input element itself */
 }
-/* Style the track fill (progress) - Firefox */
+/* Firefox */
 input[type="range"].seek-bar::-moz-range-track,
 input[type="range"].volume-bar::-moz-range-track {
     height: 4px;
-    background: #4d4d4d;
     border-radius: 2px;
-    border: none; /* Remove Firefox default border */
+    border: none;
+    background: none; /* Track background is now handled by the input element itself */
 }
-
-/* Hover effect for the track */
-input[type="range"].seek-bar:hover,
-input[type="range"].volume-bar:hover {
-    /* We will style the thumb on hover instead */
-}
-
-input[type="range"].seek-bar {
-    flex-grow: 1; /* Seek bar takes available space */
-    max-width: 400px; /* Limit max width */
-}
-
-input[type="range"].volume-bar {
-    width: 80px; /* Fixed width for volume */
-}
-
-/* Slider Thumb */
+/* Thumb */
 input[type="range"].seek-bar::-webkit-slider-thumb,
 input[type="range"].volume-bar::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 12px; /* Thumb size */
+    width: 12px;
     height: 12px;
-    background: #b3b3b3; /* Thumb color */
+    background: var(--thumb-color);
     border-radius: 50%;
     cursor: pointer;
-    margin-top: -4px; /* Center thumb vertically on track */
-    transition: background 0.1s ease, box-shadow 0.1s ease;
+    margin-top: -4px; /* Center thumb vertically */
+    transition: opacity 0.2s ease; /* Keep transition if needed for other effects */
+    position: relative; /* Ensure thumb is above track gradient */
+    z-index: 2;
 }
 input[type="range"].seek-bar::-moz-range-thumb,
 input[type="range"].volume-bar::-moz-range-thumb {
     width: 12px;
     height: 12px;
-    background: #b3b3b3;
+    background: var(--thumb-color);
     border-radius: 50%;
     cursor: pointer;
-    border: none; /* Remove default border in Firefox */
-    transition: background 0.1s ease, box-shadow 0.1s ease;
+    border: none;
+    transition: opacity 0.2s ease; /* Keep transition if needed for other effects */
+    position: relative;
+    z-index: 2;
+}
+/* Show thumb and change progress color on hover */
+.audio-player-container:hover input[type="range"].seek-bar,
+.audio-player-container:hover input[type="range"].volume-bar {
+    --progress-color: var(--spotify-green); /* Change progress color on hover */
+    --thumb-color: var(--spotify-text-white); /* Keep thumb white */
 }
 
-/* Slider Thumb Hover/Active */
-input[type="range"].seek-bar:hover::-webkit-slider-thumb,
-input[type="range"].volume-bar:hover::-webkit-slider-thumb {
-    background: #ffffff; /* White thumb on hover */
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2); /* Subtle glow */
-}
-input[type="range"].seek-bar:hover::-moz-range-thumb,
-input[type="range"].volume-bar:hover::-moz-range-thumb {
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
-}
-/* Change track color up to the thumb on hover */
-input[type="range"].seek-bar:hover,
-input[type="range"].volume-bar:hover {
-    /* This requires JS to update a background gradient, complex. */
-    /* Alternative: Make the whole track slightly lighter on hover */
-    background: #5a5a5a;
+input[type="range"].volume-bar {
+    width: 80px; /* Slightly narrower */
+    flex-grow: 0; /* Don't allow volume bar to grow */
+    flex-shrink: 0; /* Don't allow volume bar to shrink */
 }
 
-
+/* Right side: Volume + Other Controls */
+.player-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align content to the right */
+    gap: 8px; /* Add gap between controls */
+    overflow: hidden; /* Prevent overflow */
+}
 .volume-control {
     display: flex;
     align-items: center;
     flex-shrink: 0; /* Prevent shrinking */
-    min-width: 180px; /* Increase min-width slightly to accommodate queue button */
-    justify-content: flex-end; /* Align volume slider to the right */
+    justify-content: flex-end;
+    gap: 8px; /* Add gap between icon/slider */
 }
-
-/* New styles for volume icon */
 .volume-icon-container {
-    margin-right: 8px; /* Space between icon and slider */
-    color: #b3b3b3; /* Default icon color */
-    cursor: pointer; /* Optional: Add if making icon clickable later */
+    margin-right: 0;
+    color: var(--spotify-text-grey);
+    cursor: pointer;
     transition: color 0.2s ease;
-    width: 20px; /* Set a fixed width for alignment */
-    text-align: center; /* Center the icon */
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0; /* Prevent shrinking */
 }
-
-.volume-icon-container i { /* Target i tags instead of svg */
-    font-size: 18px; /* Adjust icon size if needed */
-    /* width/height are less relevant for font icons */
-    /* fill: currentColor; Removed, color is inherited */
-    display: none; /* Hide all by default, JS will show the correct one */
-    vertical-align: middle; /* Align icon vertically */
-}
-
-.volume-icon-container i.active { /* Target i tags */
-    display: inline-block; /* Show the active icon */
-}
-
-.volume-icon-container:hover {
-    color: #ffffff; /* White on hover */
-}
-
-/* Queue Toggle Button in Volume Control */
-.queue-toggle-button {
-    margin-left: 10px; /* Space between volume slider and queue button */
-    padding: 5px;
-}
-.queue-toggle-button i {
-    font-size: 18px; /* Adjust icon size */
-}
-
-/* Queue Modal Styles - MODIFIED for positioning and display */
-.queue-modal-container {
-    position: fixed;
-    bottom: 85px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 500px;
-    z-index: 1100;
-    /* Use display: none initially instead of visibility/opacity */
+.volume-icon-container i {
+    font-size: 18px;
     display: none;
-    opacity: 0; /* Keep opacity for transition */
-    transition: opacity 0.3s ease, bottom 0.3s ease; /* Adjust transition */
+    vertical-align: middle;
+}
+.volume-icon-container i.active {
+    display: inline-block;
+}
+.volume-icon-container:hover {
+    color: var(--spotify-text-white);
+}
+
+/* Queue & Lyrics Toggle Buttons */
+.queue-toggle-button,
+.lyrics-toggle-button {
+    margin: 0;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+.queue-toggle-button i,
+.lyrics-toggle-button i {
+    font-size: 18px;
+}
+
+/* --- Modals (Queue & Lyrics) --- */
+.queue-modal-container,
+.lyrics-modal-container {
+    position: fixed;
+    bottom: calc(var(--player-height) + 10px); /* Position above player */
+    right: 20px; /* Position near the right side */
+    left: auto; /* Override previous left: 50% */
+    transform: none; /* Override previous transform */
+    width: 350px; /* Fixed width */
+    max-width: none; /* Override max-width */
+    z-index: 1100;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Add transform transition */
+    transform: translateY(10px); /* Start slightly lower */
     pointer-events: none;
 }
-
-.queue-modal-container.visible {
-    /* Set display to flex (or block) when visible */
-    display: flex; /* Use flex to easily center content vertically if needed later */
-    flex-direction: column; /* Stack content vertically */
-    align-items: center; /* Center content horizontally */
+.queue-modal-container.visible,
+.lyrics-modal-container.visible {
+    display: flex;
     opacity: 1;
-    /* visibility: visible; Removed, using display now */
-    bottom: 85px;
-    /* transition: opacity 0.3s ease, bottom 0.3s ease; Removed duplicate */
+    transform: translateY(0); /* Move to final position */
     pointer-events: auto;
 }
+/* Specific z-index if needed */
+.lyrics-modal-container { z-index: 1090; }
 
-.queue-modal-content {
-    background-color: #282828;
-    padding: 15px 20px;
-    border-radius: 8px;
-    max-height: 40vh;
-    overflow-y: auto;
+.queue-modal-content,
+.lyrics-modal-content {
+    background-color: var(--spotify-medium-grey); /* Use medium grey */
+    padding: 0; /* Remove padding, handle internally */
+    border-radius: 6px;
+    max-height: 45vh; /* Adjust max height */
+    overflow: hidden; /* Hide overflow, internal scroll */
     position: relative;
-    box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.4);
-    /* Ensure content takes appropriate width within the flex container */
-    width: 100%; /* Let content fill the container width */
-    box-sizing: border-box; /* Include padding in width */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    box-sizing: border-box;
+    display: flex; /* Use flex for layout */
+    flex-direction: column;
 }
 
-.queue-modal-content h2 {
-    margin-top: 0;
-    margin-bottom: 15px; /* Reduced margin */
-    font-size: 1.1em; /* Slightly smaller heading */
-    color: #ffffff;
-    text-align: center;
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--spotify-light-grey);
+    flex-shrink: 0; /* Prevent header shrinking */
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1em; /* Smaller heading */
+    color: var(--spotify-text-white);
     border-bottom: none;
+    padding-bottom: 0;
 }
 
-.queue-modal-content .close-button {
-    position: absolute;
-    top: 8px; /* Adjusted position */
-    right: 10px; /* Adjusted position */
+.modal-header .close-button {
+    position: static; /* Remove absolute positioning */
     background: none;
     border: none;
-    font-size: 24px; /* Slightly smaller */
-    color: #aaa;
+    /* --- MODIFICATION: Adjust font-size for icon sizing --- */
+    font-size: 16px; /* Adjust icon size if needed */
+    /* --- MODIFICATION END --- */
+    color: var(--spotify-text-grey);
     cursor: pointer;
     line-height: 1;
     padding: 0;
+    width: 32px; /* Give it a size */
+    height: 32px;
+    border-radius: 50%; /* Make it circular */
+    display: inline-flex; /* Use flex for centering */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s ease; /* Add transitions */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+.modal-header .close-button:hover {
+    color: var(--spotify-text-white);
+    background-color: var(--spotify-highlight-bg);
 }
 
-.queue-modal-content .close-button:hover {
-    color: #fff;
+/* Scrollable content area within modals */
+.modal-scroll-content {
+    overflow-y: auto;
+    padding: 8px; /* Padding around the list */
+    flex-grow: 1; /* Allow content to take remaining space */
+    /* --- MODIFICATION START: Ensure horizontal scrollbar is hidden --- */
+    overflow-x: hidden;
+    /* --- MODIFICATION END --- */
 }
 
 /* Queue List Styling within Modal */
 #queue-list {
-    margin-top: 15px;
-    padding: 0; /* Remove default padding */
-    list-style: none; /* Remove default list style */
+    margin-top: 0;
+    padding: 0;
+    list-style: none;
 }
-
-/* Style for section headers */
 .queue-section-header {
-    background-color: #333; /* Slightly different background */
-    color: #ccc;
-    font-weight: bold;
+    color: var(--spotify-text-grey);
+    font-weight: 600;
     font-size: 0.8em;
-    padding: 8px 10px;
-    margin-top: 10px; /* Space above headers */
-    margin-bottom: 5px; /* Space below headers */
+    padding: 10px 8px 4px 8px; /* Adjust padding */
+    margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-radius: 3px;
-    /* Ensure it doesn't look like a playable item */
+    background: none; /* Remove background */
     cursor: default;
+    position: sticky; /* Make headers sticky */
+    top: 0;
+    background-color: var(--spotify-medium-grey); /* Match modal bg */
+    z-index: 5; /* Above list items */
 }
-.queue-section-header:first-child {
-    margin-top: 0; /* No top margin for the very first header */
-}
-
-#queue-list li:not(.queue-section-header) { /* Apply item styles only to non-header li */
-    /* Inherits from .item-list li */
-    padding: 10px 5px; /* Slightly less padding */
-    background-color: transparent; /* Ensure no background initially */
-    border-radius: 0; /* Remove rounding inside modal list */
-    /* Ensure flex properties are set if not inherited */
+#queue-list li:not(.queue-section-header) {
+    /* --- MODIFICATION START: Ensure flex layout --- */
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #282828; /* Add separator back */
+    justify-content: space-between; /* Keep space-between */
+    /* --- MODIFICATION END --- */
+    padding: 8px; /* Adjust padding */
+    min-height: 45px; /* Adjust height */
+    border-radius: 4px; /* Add rounding back */
+    margin-bottom: 4px; /* Space between items */
+    cursor: default; /* Not clickable by default */
 }
 #queue-list li:not(.queue-section-header):hover {
-     background-color: #3a3a3a; /* Different hover for modal */
+     background-color: var(--spotify-highlight-bg); /* Use standard highlight */
 }
 #queue-list li:last-child:not(.queue-section-header) {
-    border-bottom: none; /* Remove border from last actual item */
+    margin-bottom: 0;
 }
-
 
 #queue-list .item-info {
-    /* Inherits */
-    flex-grow: 1; /* Ensure info takes up space */
-    margin-right: 10px; /* Space before actions */
+    margin-right: 10px;
+    /* --- MODIFICATION START: Ensure item-info grows but doesn't wrap --- */
+    flex-grow: 1;
+    overflow: hidden; /* Already present, but ensure it's working */
+    /* --- MODIFICATION END --- */
 }
 #queue-list .item-title {
-    /* Inherits */
-    font-size: 0.95em;
+    font-size: 0.9em;
+    /* --- MODIFICATION START: Ensure text doesn't wrap --- */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* --- MODIFICATION END --- */
 }
 #queue-list .item-artist {
-    /* Inherits */
-    font-size: 0.8em;
+    font-size: 0.75em;
+    /* --- MODIFICATION START: Ensure text doesn't wrap --- */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* --- MODIFICATION END --- */
 }
 
 /* Actions within queue list */
 #queue-list .actions {
-    display: flex;
-    align-items: center;
+    opacity: 1; /* Always show actions in queue */
+    /* --- MODIFICATION START: Ensure actions don't shrink --- */
     flex-shrink: 0;
+    /* --- MODIFICATION END --- */
 }
-
-/* Style for the remove button in the queue */
 #queue-list .remove-queue-button {
-    background: none;
-    border: none;
-    color: #888; /* Dim color */
-    cursor: pointer;
-    padding: 3px 6px; /* Small padding */
-    margin-left: 8px; /* Space from other potential actions */
-    font-size: 1.1em; /* Adjust size */
-    line-height: 1;
-    transition: color 0.2s ease;
+    /* Inherits from .action-button:
+       - size (width/height: 32px)
+       - display: inline-flex, align/justify: center
+       - border-radius: 50%
+       - background: transparent
+       - cursor: pointer
+       - transition
+    */
+    color: var(--spotify-text-grey); /* Default icon color */
+    margin-left: 8px; /* Space if needed */
 }
-
+#queue-list .remove-queue-button i {
+    font-size: 14px; /* Adjust icon size */
+    line-height: 1; /* Ensure vertical alignment */
+}
 #queue-list .remove-queue-button:hover {
-    color: #eee; /* Brighter on hover */
+    color: var(--spotify-text-white); /* Icon color on hover */
+    transform: scale(1.1); /* Inherited from .action-button:hover */
+    background-color: transparent; /* Ensure background remains transparent */
 }
+#queue-list .remove-queue-button:active {
+     transform: scale(0.95); /* Inherited from .action-button:active */
+}
+/* --- MODIFICATION START: Style for disabled remove button --- */
+#queue-list .remove-queue-button:disabled {
+    opacity: 0.4; /* Make it dimmer */
+    cursor: not-allowed; /* Indicate it's not clickable */
+    transform: none; /* Prevent hover/active scale effects */
+    color: var(--spotify-light-grey); /* Use a dimmer color */
+}
+#queue-list .remove-queue-button:disabled:hover {
+    background-color: transparent; /* Ensure no background change on hover */
+    color: var(--spotify-light-grey); /* Keep dimmer color on hover */
+}
+/* --- MODIFICATION END --- */
 
 /* Highlight currently playing/next track */
 #queue-list li.is-playing .item-title,
 #queue-list li.is-playing .item-artist {
-    color: #1DB954; /* Spotify green for playing track */
-    font-weight: bold;
+    color: var(--spotify-green);
+    font-weight: 500; /* Less bold */
 }
-/* Remove is-next styling if sections make it redundant */
-/*
-#queue-list li.is-next .item-title {
-    color: #ddd;
-}
-*/
 
 #queue-list .loading-placeholder,
 #queue-list .empty-queue {
     text-align: center;
-    color: #888;
+    color: var(--spotify-text-grey);
     padding: 20px;
     font-style: italic;
     border-bottom: none;
 }
-#queue-list .empty-queue:hover {
-    background-color: transparent; /* No hover effect */
+#queue-list .empty-queue:hover { background-color: transparent; }
+
+/* --- Lyrics Modal Specific Styles --- */
+.lyrics-modal-content {
+    text-align: left; /* Align text left */
+}
+.lyrics-actions {
+    position: sticky;
+    top: 0; /* Stick to top of scrollable area */
+    background-color: var(--spotify-medium-grey); /* Match modal background */
+    padding: 10px 16px; /* Padding around buttons */
+    z-index: 10;
+    text-align: right; /* Align buttons right */
+    border-bottom: 1px solid var(--spotify-light-grey); /* Separator */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+.lyrics-action-button {
+    padding: 6px 12px;
+    font-size: 0.8em; /* Smaller buttons */
+    border-radius: 4px; /* Less rounded */
+    cursor: pointer;
+    border: 1px solid var(--spotify-light-grey);
+    background-color: transparent;
+    color: var(--spotify-text-grey);
+    margin-left: 8px; /* Space between buttons */
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+}
+.lyrics-action-button:hover {
+    background-color: var(--spotify-highlight-bg);
+    color: var(--spotify-text-white);
+    border-color: var(--spotify-text-grey);
+}
+.lyrics-action-button:active { transform: scale(0.96); }
+
+/* Specific button styles */
+#save-lyrics-button, #save-sync-button {
+    background-color: var(--spotify-green);
+    color: var(--spotify-black);
+    border-color: var(--spotify-green);
+    font-weight: 600;
+}
+#save-lyrics-button:hover, #save-sync-button:hover {
+    background-color: var(--spotify-green-light);
+    border-color: var(--spotify-green-light);
+}
+
+/* Lyrics Edit Textarea */
+.lyrics-edit-textarea {
+    width: calc(100% - 16px); /* Full width minus padding */
+    height: 35vh;
+    background-color: var(--spotify-dark-grey); /* Darker bg */
+    color: var(--spotify-text-white);
+    border: 1px solid var(--spotify-light-grey);
+    border-radius: 4px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 0.9em;
+    line-height: 1.6;
+    resize: vertical;
+    box-sizing: border-box;
+    margin: 8px; /* Margin within scroll content */
+}
+
+/* Hide elements based on mode */
+/* (Keep existing visibility rules using display: none !important;) */
+/* ... */
+
+/* Lyrics Display Area */
+.lyrics-display-area {
+    color: var(--spotify-text-grey);
+    font-size: 1.2em; /* Larger lyrics font */
+    line-height: 1.6;
+    padding: 8px; /* Padding within scroll content */
+    font-weight: 500; /* Slightly bolder */
+    /* --- MODIFICATION START: Add position relative --- */
+    position: relative;
+    /* --- MODIFICATION END --- */
+}
+.lyrics-display-area p {
+    margin: 0 0 10px 0; /* Space below lines */
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    cursor: default;
+    text-align: left; /* Align lyrics left */
+    opacity: 0.7; /* Dim inactive lines */
+}
+
+/* Style for the currently active synced lyric line */
+.lyrics-display-area p.active {
+    color: var(--spotify-text-white); /* White active line */
+    font-weight: 700; /* Bolder active line */
+    background-color: transparent; /* No background highlight */
+    opacity: 1; /* Fully opaque */
+    /* --- MODIFICATION START: Remove transform scale --- */
+    /* transform: scale(1.02); */ /* Remove this line to prevent layout shift */
+    /* --- MODIFICATION END --- */
+    transition: color 0.3s ease, opacity 0.3s ease; /* Removed transform from transition */
+}
+
+/* Sync Mode Specific Styles */
+.lyrics-modal-container.sync-mode #lyrics-display p {
+    cursor: pointer;
+    position: relative;
+    padding-right: 70px; /* Ensure space for timestamp */
+    opacity: 1; /* All lines opaque initially in sync mode */
+}
+.lyrics-modal-container.sync-mode #lyrics-display p:hover {
+    background-color: var(--spotify-highlight-bg);
+}
+
+/* CURRENT line to be marked */
+.lyrics-modal-container.sync-mode #lyrics-display p.sync-current {
+    color: var(--spotify-green);
+    font-weight: 700;
+    opacity: 1;
+}
+/* UPCOMING line */
+.lyrics-modal-container.sync-mode #lyrics-display p.sync-upcoming {
+    color: var(--spotify-text-white); /* White upcoming line */
+    font-weight: 500;
+    opacity: 0.8; /* Slightly dimmer */
+}
+/* Marked lines */
+.lyrics-modal-container.sync-mode #lyrics-display p.synced {
+    color: var(--spotify-text-grey); /* Grey synced lines */
+    font-style: normal; /* Remove italic */
+    cursor: default;
+    opacity: 0.6; /* Dimmer */
+}
+.lyrics-modal-container.sync-mode #lyrics-display p.synced:hover {
+    background-color: transparent;
+}
+
+/* Timestamp Style */
+.lyrics-timestamp {
+    font-size: 0.75em;
+    color: var(--spotify-text-grey);
+    font-style: normal;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 400; /* Normal weight */
+    opacity: 0.8; /* Slightly transparent */
+}
+.lyrics-modal-container.sync-mode #lyrics-display p.synced .lyrics-timestamp {
+    color: var(--spotify-light-grey); /* Even dimmer for synced timestamps */
+}
+
+
+.lyrics-loading,
+.lyrics-unavailable,
+.lyrics-instrumental-message {
+    text-align: center;
+    color: var(--spotify-text-grey);
+    padding: 30px 10px;
+    font-style: italic;
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+/* Instrumental '♫' symbol */
+.lyrics-display-area p.lyrics-instrumental {
+    color: var (--spotify-text-grey);
+    font-style: italic;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+/* Sync Markers "..." */
+.lyrics-sync-marker {
+    color: var(--spotify-light-grey);
+    /* font-style: italic; */ /* Remove italic if using dots */
+    font-size: 0.9em;
+    text-align: center;
+    margin: 15px 0; /* Add more margin */
+    cursor: default !important;
+    pointer-events: none;
+    display: flex; /* Use flex for dot alignment */
+    justify-content: center;
+    align-items: center;
+    height: 20px; /* Give it some height */
+    /* Ensure it's not hidden by overflow if lyrics-display-area has it */
+    width: 100%; /* Take full width */
+    /* --- MODIFICATION START: Ensure initial visibility --- */
+    opacity: 1;
+    /* --- MODIFICATION END --- */
+}
+.lyrics-sync-marker:hover { background-color: transparent !important; }
+
+/* Bouncing dot animation */
+/* Ensure this targets the spans inside the marker */
+.lyrics-sync-marker span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: var(--spotify-light-grey); /* Check color */
+    border-radius: 50%;
+    margin: 0 3px; /* Adjust spacing */
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.lyrics-sync-marker span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.lyrics-sync-marker span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+/* Ensure the keyframes animation is defined */
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0; /* Ensure dots are invisible when scaled down */
+    } 40% {
+        transform: scale(1.0);
+        opacity: 1; /* Ensure dots are visible when scaled up */
+    }
+}
+
+/* --- Album Detail Specific --- */
+.album-header {
+    display: flex;
+    align-items: flex-end; /* Align items to bottom */
+    margin-bottom: 40px;
+    max-width: 900px;
+    width: 100%;
+    padding: 20px 0; /* Add some padding */
+}
+.album-cover {
+    width: 180px; /* Larger cover */
+    height: 180px;
+    object-fit: cover;
+    margin-right: 24px;
+    border-radius: 4px;
+    background-color: var(--spotify-medium-grey);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Add shadow */
+    flex-shrink: 0;
+}
+.album-info { /* Added to ensure album-info takes remaining space */
+    flex-grow: 1;
+    min-width: 0; /* Prevent flex item overflow */
+}
+
+/* --- MODIFICATION START: Style for title header and button placement --- */
+.album-title-header {
+    display: flex;
+    align-items: center; /* Vertically align title and button */
+    justify-content: space-between; /* Push button to the right */
+    margin-bottom: 10px; /* Space below title/button */
+    gap: 15px; /* Space between title and button if title wraps */
+}
+
+.album-info h1 {
+    margin: 0; /* Remove default h1 margin */
+    font-size: 2.5em; /* Larger album title */
+    flex-grow: 1; /* Allow title to take available space */
+    /* Optional: Prevent title from wrapping too aggressively */
+    /* white-space: nowrap; */
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+}
+
+.album-info .actions { /* Target the actions div within album-info */
+     margin: 0; /* Remove margin from actions div */
+     flex-shrink: 0; /* Prevent button shrinking */
+     opacity: 1; /* Ensure actions div is visible */
+}
+
+.album-info .add-library-button {
+    margin: 0; /* Remove margin from button itself */
+    opacity: 1; /* Ensure button is visible */
+    width: 36px;
+    height: 36px;
+}
+.album-info .add-library-button i {
+    font-size: 16px; /* Adjust icon size */
+}
+.album-info .add-library-button:disabled {
+    opacity: 0.6; /* Dim disabled button */
+    cursor: not-allowed;
+    transform: none; /* Prevent hover scale */
+}
+.album-info .add-library-button:disabled:hover {
+    color: var(--spotify-text-grey); /* Keep icon grey on hover when disabled */
+}
+/* --- MODIFICATION END --- */
+
+.album-info p {
+    margin: 0 0 5px 0;
+    color: var(--spotify-text-grey);
+    text-align: left;
+    font-size: 0.9em;
+}
+.album-info p a { /* Style links within album info */
+    color: var(--spotify-text-white);
+    font-weight: 500;
+}
+.album-info p a:hover {
+    text-decoration: underline;
+}
+
+.back-link {
+    display: block;
+    margin-top: 40px;
+    text-align: left;
+    max-width: 900px;
+    width: 100%;
+    font-size: 0.9em;
+}
+.back-link a {
+    color: var(--spotify-text-grey);
+}
+.back-link a:hover {
+    color: var(--spotify-text-white);
+}
+
+/* --- Add Spotify Page --- */
+.logs-container {
+    background-color: var(--spotify-dark-grey);
+    border: 1px solid var(--spotify-medium-grey);
+    border-radius: 4px;
+    padding: 15px;
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+    font-size: 0.85em;
+    color: var(--spotify-text-grey);
+    max-width: 900px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.logs-container h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1em;
+    color: var(--spotify-text-white);
+}
+.logs-container p {
+    margin: 2px 0;
+    line-height: 1.4;
+    max-width: none; /* Allow logs to fill container */
+    word-break: break-all; /* Break long lines */
+}
+.error p { /* Style error messages */
+    color: #f44336; /* Red for errors */
+    font-weight: bold;
 }

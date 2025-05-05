@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Browse Media - Music Player{% endblock %}
+
+{% block content %}
+    <h1>Browse All Media</h1>
+
+    <!-- Albums -->
+    <h2>Albums</h2>
+    {% if all_albums %}
+        <ul class="item-list">
+            {% for album in all_albums %}
+                <li>
+                    <span class="item-info">
+                        {# Link to album detail view #}
+                        <a href="{% url 'album_detail' album.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'album_detail' album.id %}">{{ album.title }}</a>
+                        <span class="item-artist">{{ album.artists.first.name }}{% if album.artists.count > 1 %}, and others{% endif %}</span>
+                    </span>
+                    <div class="actions">
+                        {% if album.id in user_library_album_ids %}
+                            <button type="button" class="action-button add-library-button" disabled title="Already in Library">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        {% else %}
+                            <button type="button" class="action-button add-library-button"
+                                    data-media-type="album"
+                                    data-media-id="{{ album.id }}"
+                                    title="Add Album to Library">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-library">No albums found in the database.</p>
+    {% endif %}
+
+    <!-- EPs -->
+    <h2>EPs</h2>
+    {% if all_eps %}
+        <ul class="item-list">
+            {% for ep in all_eps %}
+                <li>
+                    <span class="item-info">
+                        {# --- MODIFICATION START: Link to EP detail view --- #}
+                        <a href="{% url 'ep_detail' ep.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'ep_detail' ep.id %}">{{ ep.title }}</a>
+                        {# --- MODIFICATION END --- #}
+                        <span class="item-artist">{{ ep.artists.first.name }}{% if ep.artists.count > 1 %}, and others{% endif %}</span>
+                    </span>
+                    <div class="actions">
+                        {% if ep.id in user_library_ep_ids %}
+                            <button type="button" class="action-button add-library-button" disabled title="Already in Library">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        {% else %}
+                            <button type="button" class="action-button add-library-button"
+                                    data-media-type="ep"
+                                    data-media-id="{{ ep.id }}"
+                                    title="Add EP to Library">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-library">No EPs found in the database.</p>
+    {% endif %}
+
+    <!-- Singles -->
+    <h2>Singles</h2>
+    {% if all_singles %}
+        <ul class="item-list">
+            {% for single in all_singles %}
+                <li>
+                    <span class="item-info">
+                        {# --- MODIFICATION START: Link to Single detail view --- #}
+                        <a href="{% url 'single_detail' single.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'single_detail' single.id %}">{{ single.title }}</a>
+                        {# --- MODIFICATION END --- #}
+                        <span class="item-artist">{{ single.artists.first.name }}{% if single.artists.count > 1 %}, and others{% endif %}</span>
+                    </span>
+                    <div class="actions">
+                        {% if single.id in user_library_single_ids %}
+                            <button type="button" class="action-button add-library-button" disabled title="Already in Library">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        {% else %}
+                            <button type="button" class="action-button add-library-button"
+                                    data-media-type="single"
+                                    data-media-id="{{ single.id }}"
+                                    title="Add Single to Library">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-library">No singles found in the database.</p>
+    {% endif %}
+
+    <div class="back-link">
+        <a href="{% url 'home' %}" class="ajax-link" data-target-url="{% url 'home' %}">Back to Home</a>
+    </div>
+{% endblock %}

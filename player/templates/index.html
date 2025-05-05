@@ -10,7 +10,7 @@
     <!-- Links - Add 'ajax-link' class and data-target-url -->
     <div class="nav-links">
         <a href="{% url 'add_spotify_content' %}" class="ajax-link" data-target-url="{% url 'add_spotify_content' %}">Add from Spotify URL</a> |
-        <a href="{% url 'browse_songs' %}" class="ajax-link" data-target-url="{% url 'browse_songs' %}">Browse All Songs</a>
+        <a href="{% url 'browse_media' %}" class="ajax-link" data-target-url="{% url 'browse_media' %}">Browse Media</a>
     </div>
 
     <!-- Library Sections -->
@@ -75,8 +75,8 @@
                 {% for ep in user_library_eps %}
                     <li>
                         <span class="item-info">
-                            {# TODO: Update EP link for AJAX if EP detail page exists #}
-                            <span class="item-title">{{ ep.title }}</span>
+                            {# Update EP link for AJAX #}
+                            <a href="{% url 'ep_detail' ep.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'ep_detail' ep.id %}">{{ ep.title }}</a>
                             <span class="item-artist">{{ ep.artists.first.name }}{% if ep.artists.count > 1 %} et al.{% endif %}</span>
                         </span>
                     </li>
@@ -93,8 +93,8 @@
                 {% for single in user_library_singles %}
                     <li>
                         <span class="item-info">
-                             {# TODO: Update Single link for AJAX if Single detail page exists #}
-                            <span class="item-title">{{ single.title }}</span>
+                             {# Update Single link for AJAX #}
+                            <a href="{% url 'single_detail' single.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'single_detail' single.id %}">{{ single.title }}</a>
                             <span class="item-artist">{{ single.artists.first.name }}{% if single.artists.count > 1 %} et al.{% endif %}</span>
                         </span>
                     </li>

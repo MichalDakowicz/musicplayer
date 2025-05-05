@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ album.title }} - Music Player{% endblock %}
+{% block title %}{{ ep.title }} - Music Player{% endblock %}
 
 {% block extra_head %}
-    {# Keep page-specific styles if needed, or move to main style.css #}
+    {# Reuse album detail styles or create specific EP styles if needed #}
     <style>
-        .album-header {
+        .album-header { /* Reusing album styles for consistency */
             display: flex;
             align-items: flex-start;
             margin-bottom: 30px;
@@ -31,14 +31,12 @@
             color: #b3b3b3;
             text-align: left;
         }
-        /* Styles for song list within album detail */
         .song-list {
             list-style: none;
             padding: 0;
             max-width: 700px;
             width: 100%;
         }
-        /* ... other specific styles for this page ... */
         .back-link {
             display: block;
             margin-top: 30px;
@@ -46,87 +44,64 @@
             max-width: 700px;
             width: 100%;
         }
-        /* --- MODIFICATION START: Adjust styles for new title/button layout --- */
         .album-title-header {
             display: flex;
-            align-items: center; /* Vertically align title and button */
-            justify-content: space-between; /* Push button to the right */
-            margin-bottom: 10px; /* Space below title/button */
-            gap: 15px; /* Space between title and button if title wraps */
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 15px;
         }
-        .album-info h1 {
-            margin: 0; /* Remove default h1 margin */
-            flex-grow: 1; /* Allow title to take available space */
-        }
-        .album-info .actions {
-             margin: 0; /* Remove margin from actions div */
-             flex-shrink: 0; /* Prevent button shrinking */
-        }
-        .album-info .add-library-button {
-            margin: 0; /* Remove margin from button itself */
-            opacity: 1; /* Ensure button is visible */
-            width: 36px;
-            height: 36px;
-        }
-        .album-info .add-library-button i {
-            font-size: 16px;
-        }
-        .album-info .add-library-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        /* --- MODIFICATION END --- */
+        .album-info h1 { margin: 0; flex-grow: 1; }
+        .album-info .actions { margin: 0; flex-shrink: 0; }
+        .album-info .add-library-button { margin: 0; opacity: 1; width: 36px; height: 36px; }
+        .album-info .add-library-button i { font-size: 16px; }
+        .album-info .add-library-button:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 {% endblock %}
 
 {% block content %}
-    <div class="album-header">
-        {% if album.cover_image %}
-            <img src="{{ album.cover_image.url }}" alt="{{ album.title }} Cover" class="album-cover">
-        {% elif album.cover_image_url %}
-            <img src="{{ album.cover_image_url }}" alt="{{ album.title }} Cover (from URL)" class="album-cover">
+    <div class="album-header"> {# Reusing album class names #}
+        {% if ep.cover_image %}
+            <img src="{{ ep.cover_image.url }}" alt="{{ ep.title }} Cover" class="album-cover">
+        {% elif ep.cover_image_url %}
+            <img src="{{ ep.cover_image_url }}" alt="{{ ep.title }} Cover (from URL)" class="album-cover">
         {% else %}
-            <div class="album-cover"></div>
+            <div class="album-cover"></div> {# Placeholder #}
         {% endif %}
         <div class="album-info">
-            {# --- MODIFICATION START: Wrap title and button --- #}
             <div class="album-title-header">
-                <h1>{{ album.title }}</h1>
-                <div class="actions"> {# Actions div now only contains the add button #}
-                    {% if album.id in user_library_album_ids %}
+                <h1>{{ ep.title }}</h1>
+                <div class="actions">
+                    {% if ep.id in user_library_ep_ids %}
                         <button type="button" class="action-button add-library-button" disabled title="Already in Library">
                             <i class="fa-solid fa-check"></i>
                         </button>
                     {% else %}
                         <button type="button" class="action-button add-library-button"
-                                data-media-type="album"
-                                data-media-id="{{ album.id }}"
-                                title="Add Album to Library">
+                                data-media-type="ep"
+                                data-media-id="{{ ep.id }}"
+                                title="Add EP to Library">
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     {% endif %}
                 </div>
             </div>
-            {# --- MODIFICATION END --- #}
-            <p>By: {% for artist in album.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-            {% if album.release_date %}
-                <p>Released: {{ album.release_date|date:"Y" }}</p>
+            <p>EP by: {% for artist in ep.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            {% if ep.release_date %}
+                <p>Released: {{ ep.release_date|date:"Y" }}</p>
             {% endif %}
-            <p>{{ album_songs.count }} song{{ album_songs.count|pluralize }}</p>
-
-            {# Button moved up #}
-
+            <p>{{ ep_songs.count }} song{{ ep_songs.count|pluralize }}</p>
         </div>
     </div>
 
-    {% if album_songs %}
+    {% if ep_songs %}
         <ul class="song-list">
-            {% for song in album_songs %}
+            {% for song in ep_songs %}
                 <li>
                     <span>{{ song.title }}</span>
                     <div class="actions">
                         {% if song.file %}
-                            <button type="button" class="play-button"
+                            <button type="button" class="action-button play-button"
                                     data-song-url="{{ song.file.url }}"
                                     data-song-title="{{ song.title }}"
                                     data-song-artist="{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
@@ -145,11 +120,10 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p style="text-align: center; max-width: 700px; width: 100%;">No songs found for this album.</p>
+        <p style="text-align: center; max-width: 700px; width: 100%;">No songs found for this EP.</p>
     {% endif %}
 
     <p class="back-link">
-        {# Update links for AJAX #}
         <a href="{% url 'home' %}" class="ajax-link" data-target-url="{% url 'home' %}">Back to Home</a> |
         <a href="{% url 'browse_media' %}" class="ajax-link" data-target-url="{% url 'browse_media' %}">Browse Media</a>
     </p>

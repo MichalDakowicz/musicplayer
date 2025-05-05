@@ -21,41 +21,63 @@
 
     {# --- Persistent Audio Player --- #}
     <div class="audio-player-container">
-        <img id="player-cover-art" src="{% static 'placeholder-cover.png' %}" alt="Cover Art" class="player-cover">
-        <div class="current-track-info">
-            <span id="current-track-title">No track selected</span>
-            <span id="current-track-artist"></span>
+        {# --- Player Left --- #}
+        <div class="player-left">
+            <img id="player-cover-art" src="{% static 'placeholder-cover.png' %}" alt="Cover Art" class="player-cover">
+            <div class="current-track-info">
+                <span id="current-track-title">No track selected</span>
+                <span id="current-track-artist"></span>
+            </div>
         </div>
-        <div class="player-controls">
-            {# Previous Button #}
-            <button id="previous-button" class="control-button">
-                <i class="fa-solid fa-backward-step"></i>
-            </button>
-            {# Play/Pause Button #}
-            <button id="play-pause-button" class="control-button">
-                <i id="play-icon" class="fa-solid fa-play"></i>
-                <i id="pause-icon" class="fa-solid fa-pause" style="display: none;"></i>
-            </button>
-            {# Next Button #}
-            <button id="next-button" class="control-button">
-                <i class="fa-solid fa-forward-step"></i>
-            </button>
-            <span id="current-time" class="time-display">0:00</span>
-            <input type="range" id="seek-bar" value="0" step="0.1" class="seek-bar">
-            <span id="duration" class="time-display">0:00</span>
+
+        {# --- Player Center --- #}
+        <div class="player-center">
+            <div class="player-controls">
+                {# Previous Button #}
+                <button id="previous-button" class="control-button" title="Previous">
+                    <i class="fa-solid fa-backward-step"></i>
+                </button>
+                {# Play/Pause Button #}
+                <button id="play-pause-button" class="control-button" title="Play/Pause">
+                    <i id="play-icon" class="fa-solid fa-play"></i>
+                    <i id="pause-icon" class="fa-solid fa-pause" style="display: none;"></i>
+                </button>
+                {# Next Button #}
+                <button id="next-button" class="control-button" title="Next">
+                    <i class="fa-solid fa-forward-step"></i>
+                </button>
+            </div>
+            {# --- MODIFICATION START: Group seek bar elements --- #}
+            <div class="seek-control">
+                <span id="current-time" class="time-display">0:00</span>
+                <input type="range" id="seek-bar" value="0" step="0.1" class="seek-bar">
+                <span id="duration" class="time-display">0:00</span>
+            </div>
+            {# --- MODIFICATION END --- #}
         </div>
-        <div class="volume-control">
-             <div class="volume-icon-container">
-                 <i id="volume-mute-icon" class="fa-solid fa-volume-xmark"></i>
-                 <i id="volume-low-icon" class="fa-solid fa-volume-low"></i>
-                 <i id="volume-high-icon" class="fa-solid fa-volume-high active"></i>
-             </div>
-             <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="0.8" class="volume-bar">
+
+        {# --- Player Right --- #}
+        <div class="player-right">
+            {# --- MODIFICATION START: Group volume elements --- #}
+            <div class="volume-control">
+                 <div class="volume-icon-container">
+                     <i id="volume-mute-icon" class="fa-solid fa-volume-xmark"></i>
+                     <i id="volume-low-icon" class="fa-solid fa-volume-low"></i>
+                     <i id="volume-high-icon" class="fa-solid fa-volume-high active"></i>
+                 </div>
+                 <input type="range" id="volume-bar" min="0" max="1" step="0.01" value="0.8" class="volume-bar">
+            </div>
+             {# --- MODIFICATION END --- #}
              {# Show Queue Button #}
-             <button id="show-queue-button" class="control-button queue-toggle-button">
+             <button id="show-queue-button" class="control-button queue-toggle-button" title="Show Queue">
                  <i class="fa-solid fa-list-ol"></i>
              </button>
+             {# Lyrics Toggle Button #}
+             <button id="lyrics-toggle-button" class="control-button lyrics-toggle-button" title="Show Lyrics">
+                 <i class="fa-solid fa-microphone-lines"></i>
+             </button>
         </div>
+
         <audio id="audio-player" preload="metadata"></audio>
     </div>
     {# --- End Persistent Audio Player --- #}
@@ -63,15 +85,61 @@
     {# --- Queue Modal --- #}
     <div id="queue-modal" class="queue-modal-container" style="display: none;">
         <div class="queue-modal-content">
-            <button id="close-queue-button" class="close-button">&times;</button>
-            <h2>Playback Queue</h2>
-            <ul id="queue-list" class="item-list">
-                {# Queue items will be loaded here by JS #}
-                <li class="loading-placeholder">Loading queue...</li>
-            </ul>
+            {# --- MODIFICATION START: Use Font Awesome icon --- #}
+            <div class="modal-header">
+                <h2>Playback Queue</h2>
+                <button id="close-queue-button" class="close-button" title="Close Queue">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            {# --- MODIFICATION END --- #}
+            <div class="modal-scroll-content"> {# Added scroll container #}
+                <ul id="queue-list"> {# Removed item-list class, specific styles apply #}
+                    {# Queue items will be loaded here by JS #}
+                    <li class="loading-placeholder">Loading queue...</li>
+                </ul>
+            </div> {# End scroll container #}
         </div>
     </div>
     {# --- End Queue Modal --- #}
+
+    {# --- Lyrics Modal --- #}
+    <div id="lyrics-modal" class="lyrics-modal-container" style="display: none;">
+        <div class="lyrics-modal-content">
+             {# --- MODIFICATION START: Use Font Awesome icon --- #}
+             <div class="modal-header">
+                <h2>Lyrics</h2>
+                <button id="close-lyrics-button" class="close-button" title="Close Lyrics">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            {# --- MODIFICATION END --- #}
+            {# --- Lyrics Action Buttons --- #}
+            <div class="lyrics-actions">
+                <button id="add-lyrics-button" class="lyrics-action-button" style="display: none;">Add Lyrics</button>
+                <button id="edit-lyrics-button" class="lyrics-action-button" style="display: none;">Edit Lyrics</button>
+                <button id="sync-lyrics-button" class="lyrics-action-button" style="display: none;">Sync Lyrics</button>
+                {# Buttons for Edit Mode #}
+                <button id="save-lyrics-button" class="lyrics-action-button edit-mode-button" style="display: none;">Save Lyrics</button>
+                <button id="cancel-edit-button" class="lyrics-action-button edit-mode-button" style="display: none;">Cancel</button>
+                {# Buttons for Sync Mode #}
+                <button id="start-sync-button" class="lyrics-action-button sync-mode-button" style="display: none;">Start Sync</button> {# Maybe rename sync-lyrics-button to this? #}
+                <button id="mark-sync-line-button" class="lyrics-action-button sync-mode-button" style="display: none;">Mark Line Time</button>
+                <button id="save-sync-button" class="lyrics-action-button sync-mode-button" style="display: none;">Save Synced Lyrics</button>
+                <button id="cancel-sync-button" class="lyrics-action-button sync-mode-button" style="display: none;">Cancel Sync</button>
+            </div>
+            {# --- Lyrics Display/Edit Area --- #}
+            <div class="modal-scroll-content"> {# Added scroll container #}
+                <div id="lyrics-display" class="lyrics-display-area">
+                    {# Lyrics will be loaded here by JS #}
+                    <p class="lyrics-loading">Loading lyrics...</p>
+                </div>
+                {# --- Lyrics Edit Textarea (Hidden initially) --- #}
+                <textarea id="lyrics-edit-area" class="lyrics-edit-textarea" style="display: none;"></textarea>
+            </div> {# End scroll container #}
+        </div>
+    </div>
+    {# --- End Lyrics Modal --- #}
 
     {# Link the JavaScript file at the end of the body #}
     <script src="{% static 'player.js' %}"></script>

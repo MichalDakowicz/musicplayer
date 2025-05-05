@@ -20,6 +20,13 @@ from django.db import transaction # Import transaction
 from django.db.models import Max # Import Max
 import json # Add json import
 import traceback # Ensure traceback is imported if not already
+import syncedlyrics # Import the syncedlyrics library
+# --- MODIFICATION START: Import lyrics providers ---
+# Note: Direct import and use of providers might be complex.
+# Relying on spotdl command line with --lyrics is simpler.
+# from spotdl.providers.lyrics import Genius, MusixMatch, AzLyrics, Synced
+# --- MODIFICATION END ---
+from django.core.exceptions import ObjectDoesNotExist # Import ObjectDoesNotExist
 
 
 from .forms import LoginForm, SpotifyUrlForm # Import the new form
@@ -49,13 +56,17 @@ def download_image(url, obj, field_name, save_name):
         # Create a ContentFile from the response content
         img_content = ContentFile(response.content)
 
+        # --- MODIFICATION START: Set the name attribute on the ContentFile ---
+        img_content.name = save_name
+        # --- MODIFICATION END ---
+
         # Assign the ContentFile to the object's field attribute directly
         # The actual saving to storage happens when obj.save() is called later
         setattr(obj, field_name, img_content)
         # Store the intended save name separately if needed, though Django handles naming
         # obj._image_save_name = save_name # Example if needed elsewhere
 
-        print(f"Image content prepared for {field_name} on object {obj.pk or '(unsaved)'}")
+        print(f"Image content prepared for {field_name} on object {obj.pk or '(unsaved)'} with name '{save_name}'")
         return True # Indicate success in preparing the image content
 
     except requests.exceptions.RequestException as e:
@@ -108,6 +119,7 @@ def run_spotdl_and_get_path(spotify_url, track_id, expected_title=None, expected
         'spotdl',
         spotify_url,
         '--output', output_format,
+        # --- REMOVED: '--lyrics', 'musixmatch', ---
         # '--log-level', 'DEBUG'
     ]
     print(f"Running command: {' '.join(cmd)}")
@@ -284,14 +296,35 @@ def logout(request):
 
 # Modify this view
 @login_required
-def browse_songs(request):
-    """Displays all songs available in the database."""
-    all_songs = Song.objects.all().order_by('title') # Get all songs, order by title
+# --- MODIFICATION START: Rename view and update logic ---
+def browse_media(request):
+    """Displays all albums, EPs, and singles available in the database."""
+    all_albums = Album.objects.all().order_by('title')
+    all_eps = EP.objects.all().order_by('title')
+    all_singles = Single.objects.all().order_by('title')
+    # Optionally add Artists and Playlists if desired
+
+    user_library_album_ids = []
+    user_library_ep_ids = []
+    user_library_single_ids = []
+    try:
+        library = request.user.library
+        user_library_album_ids = list(library.albums.values_list('id', flat=True))
+        user_library_ep_ids = list(library.eps.values_list('id', flat=True))
+        user_library_single_ids = list(library.singles.values_list('id', flat=True))
+    except (Library.DoesNotExist, AttributeError):
+        pass # User might not have a library yet or library relation failed
 
     context = {
-        'all_songs': all_songs,
+        'all_albums': all_albums,
+        'all_eps': all_eps,
+        'all_singles': all_singles,
+        'user_library_album_ids': user_library_album_ids,
+        'user_library_ep_ids': user_library_ep_ids,
+        'user_library_single_ids': user_library_single_ids,
     }
-    return render(request, 'browse_songs.html', context)
+    return render(request, 'browse_media.html', context) # Use new template name
+# --- MODIFICATION END ---
 
 # New view for album details
 @login_required
@@ -300,11 +333,129 @@ def album_detail(request, album_id):
     album = get_object_or_404(Album, id=album_id)
     album_songs = album.songs.all().order_by('title') # Or by track number if you add it
 
+    # --- MODIFICATION START: Fetch user library info ---
+    user_library_album_ids = []
+    try:
+        library = request.user.library
+        user_library_album_ids = list(library.albums.values_list('id', flat=True))
+    except (Library.DoesNotExist, AttributeError):
+        pass # User might not have a library yet
+    # --- MODIFICATION END ---
+
     context = {
         'album': album,
         'album_songs': album_songs,
+        # --- MODIFICATION START: Add library info to context ---
+        'user_library_album_ids': user_library_album_ids,
+        # --- MODIFICATION END ---
     }
     return render(request, 'album_detail.html', context)
+
+# --- MODIFICATION START: Add EP Detail View ---
+@login_required
+def ep_detail(request, ep_id):
+    """Displays details for a specific EP and its songs."""
+    ep = get_object_or_404(EP, id=ep_id)
+    ep_songs = ep.songs.all().order_by('title')
+
+    user_library_ep_ids = []
+    try:
+        library = request.user.library
+        user_library_ep_ids = list(library.eps.values_list('id', flat=True))
+    except (Library.DoesNotExist, AttributeError):
+        pass
+
+    context = {
+        'ep': ep,
+        'ep_songs': ep_songs,
+        'user_library_ep_ids': user_library_ep_ids,
+    }
+    return render(request, 'ep_detail.html', context)
+# --- MODIFICATION END ---
+
+# --- MODIFICATION START: Add Single Detail View ---
+@login_required
+def single_detail(request, single_id):
+    """Displays details for a specific single and its songs."""
+    single = get_object_or_404(Single, id=single_id)
+    single_songs = single.songs.all().order_by('title')
+
+    user_library_single_ids = []
+    try:
+        library = request.user.library
+        user_library_single_ids = list(library.singles.values_list('id', flat=True))
+    except (Library.DoesNotExist, AttributeError):
+        pass
+
+    context = {
+        'single': single,
+        'single_songs': single_songs,
+        'user_library_single_ids': user_library_single_ids,
+    }
+    return render(request, 'single_detail.html', context)
+# --- MODIFICATION END ---
+
+# --- MODIFICATION START: Add add_to_library view ---
+@login_required
+@require_POST # Expect POST request
+@csrf_protect
+def add_to_library(request):
+    """Adds an item (Album, EP, Single, etc.) to the user's library."""
+    try:
+        data = json.loads(request.body)
+        media_type = data.get('media_type')
+        media_id = data.get('media_id')
+
+        if not media_type or not media_id:
+            return JsonResponse({'status': 'error', 'message': 'Missing media_type or media_id.'}, status=400)
+
+        try:
+            media_id = int(media_id) # Ensure ID is an integer
+        except ValueError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid media_id.'}, status=400)
+
+        library, _ = Library.objects.get_or_create(user=request.user)
+        item_added = False
+        item_name = ""
+
+        with transaction.atomic():
+            if media_type == 'album':
+                item = get_object_or_404(Album, id=media_id)
+                item_name = item.title
+                if not library.albums.filter(id=media_id).exists():
+                    library.albums.add(item)
+                    item_added = True
+            elif media_type == 'ep':
+                item = get_object_or_404(EP, id=media_id)
+                item_name = item.title
+                if not library.eps.filter(id=media_id).exists():
+                    library.eps.add(item)
+                    item_added = True
+            elif media_type == 'single':
+                item = get_object_or_404(Single, id=media_id)
+                item_name = item.title
+                if not library.singles.filter(id=media_id).exists():
+                    library.singles.add(item)
+                    item_added = True
+            # Add elif blocks for 'artist', 'playlist' if implementing later
+            else:
+                return JsonResponse({'status': 'error', 'message': f'Unsupported media_type: {media_type}'}, status=400)
+
+        if item_added:
+            return JsonResponse({'status': 'success', 'message': f"'{item_name}' added to your library."})
+        else:
+            return JsonResponse({'status': 'info', 'message': f"'{item_name}' is already in your library."})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request format.'}, status=400)
+    except ObjectDoesNotExist:
+         return JsonResponse({'status': 'error', 'message': f'{media_type.capitalize()} not found.'}, status=404)
+    except Exception as e:
+        print(f"Error adding item to library (user {request.user.id}, type {media_type}, id {media_id}): {e}")
+        print(traceback.format_exc())
+        return JsonResponse({'status': 'error', 'message': 'Could not add item to library.'}, status=500)
+# --- MODIFICATION END ---
+
 
 # New view for adding Spotify content - MODIFIED
 @login_required
@@ -779,7 +930,7 @@ def set_currently_playing(request, song_id):
 # --- Processing Functions (Called by add_spotify_content) ---
 
 def process_spotify_track(track_id, user):
-    """Gets track info, downloads, saves to DB, returns Song object or None."""
+    """Gets track info, fetches lyrics, downloads audio, saves to DB, returns Song object or None."""
     track_logs = [] # Collect logs specific to track processing
     try:
         track_info = sp.track(track_id)
@@ -793,6 +944,7 @@ def process_spotify_track(track_id, user):
     # --- Get/Create Artists ---
     artists = []
     artist_names_for_path = [] # Store names for spotdl path finding
+    artist_names_for_lyrics = [] # Store names for syncedlyrics search
     for artist_data in track_info['artists']:
         artist, created = Artist.objects.update_or_create(
             spotify_id=artist_data['id'],
@@ -800,7 +952,7 @@ def process_spotify_track(track_id, user):
         )
         artists.append(artist)
         artist_names_for_path.append(artist.name)
-
+        artist_names_for_lyrics.append(artist.name) # Add for lyrics search
 
     # --- Get/Create Album/EP/Single (Release) ---
     # ... (keep existing release object creation logic) ...
@@ -841,7 +993,7 @@ def process_spotify_track(track_id, user):
             track_logs.append(f"Saved {release_obj._meta.verbose_name} '{release_obj.title}' (Created: {created}, Image Updated: {image_updated})")
         except Exception as e:
             track_logs.append(f"Error saving release object {release_obj.title}: {e}")
-            # Decide if this is critical - maybe proceed without cover image??
+            # Decide if this is critical - maybe proceed without cover image?
 
 
     # --- Get/Create Song ---
@@ -852,6 +1004,9 @@ def process_spotify_track(track_id, user):
         'album': release_obj if isinstance(release_obj, Album) else None,
         'ep': release_obj if isinstance(release_obj, EP) else None,
         'single': release_obj if isinstance(release_obj, Single) else None,
+        # Initialize lyrics fields as empty, they will be fetched next
+        'lyrics': None,
+        'synced_lyrics': None,
     }
     # Use update_or_create for the song as well
     song, song_created = Song.objects.update_or_create(
@@ -860,8 +1015,68 @@ def process_spotify_track(track_id, user):
     )
     song.artists.set(artists) # Associate artists
 
+    # --- MODIFICATION START: Fetch Lyrics using syncedlyrics ---
+    lyrics_fetched = False
+    synced_lyrics_fetched = False
+    update_fields_lyrics = [] # Track which lyrics fields need saving
+
+    # Only fetch if lyrics fields are currently empty
+    if not song.lyrics and not song.synced_lyrics:
+        try:
+            search_term = f"{song.title} {' '.join(artist_names_for_lyrics)}"
+            track_logs.append(f"Searching lyrics for: '{search_term}'")
+            # --- MODIFICATION: Remove allow_plain=True ---
+            lrc_result = syncedlyrics.search(search_term, save_path=None) # Don't save to file here
+            # --- MODIFICATION END ---
+
+            if lrc_result:
+                # Check if the result is a string (likely plain lyrics)
+                if isinstance(lrc_result, str):
+                    # Check if it looks like LRC format - if so, treat as synced
+                    if re.match(r'\[\d{2}:\d{2}\.\d{2,3}\]', lrc_result.strip()):
+                        song.synced_lyrics = lrc_result
+                        synced_lyrics_fetched = True
+                        update_fields_lyrics.append('synced_lyrics')
+                        track_logs.append(f"Found synced lyrics (returned as string) for '{song.title}'.")
+                    else: # Otherwise, assume it's plain text
+                        song.lyrics = lrc_result
+                        lyrics_fetched = True
+                        update_fields_lyrics.append('lyrics')
+                        track_logs.append(f"Found plain lyrics for '{song.title}'.")
+                # If it's not a string, assume it's synced (or handle object if library changes)
+                # This part might need adjustment based on how syncedlyrics returns synced results
+                # For now, let's assume if it's not a string and not None, it's synced.
+                elif lrc_result is not None: # Check explicitly for not None
+                    # Assuming the result itself is the synced lyrics string if not plain text
+                    # This might need refinement based on library's actual return type for synced.
+                    song.synced_lyrics = str(lrc_result) # Convert just in case it's an object
+                    synced_lyrics_fetched = True
+                    update_fields_lyrics.append('synced_lyrics')
+                    track_logs.append(f"Found synced lyrics (returned as non-string) for '{song.title}'.")
+                else: # lrc_result was None or empty
+                     track_logs.append(f"No lyrics found for '{song.title}'.")
+
+            else: # lrc_result was None or empty
+                track_logs.append(f"No lyrics found for '{song.title}'.")
+
+        except Exception as lyr_e:
+            track_logs.append(f"Error fetching lyrics for '{song.title}': {lyr_e}")
+            track_logs.append(traceback.format_exc()) # Add traceback for lyrics error
+
+        # Save lyrics if fetched
+        if update_fields_lyrics:
+            try:
+                song.save(update_fields=update_fields_lyrics)
+                track_logs.append(f"Saved fetched lyrics fields: {', '.join(update_fields_lyrics)}")
+            except Exception as save_lyr_e:
+                 track_logs.append(f"Error saving fetched lyrics for '{song.title}': {save_lyr_e}")
+    else:
+        track_logs.append(f"Lyrics already exist for '{song.title}'. Skipping fetch.")
+    # --- MODIFICATION END ---
+
+
     # --- Download File (if needed) ---
-    # Check if song.file is None/empty OR if the file doesn't exist in storage
+    # ... (keep existing download check logic) ...
     needs_download = False
     if not song.file:
         needs_download = True
@@ -891,14 +1106,46 @@ def process_spotify_track(track_id, user):
                 expected_artist=artist_names_for_path[0] if artist_names_for_path else None # Use first artist name
             )
             song.file.name = relative_file_path # Assign relative path from MEDIA_ROOT
-            song.save(update_fields=['file']) # Save only the file field update
+
+            # --- REMOVED: Lyrics File Checking Logic ---
+            # The logic to find and read .lrc/.synced.lrc files is removed
+            # as lyrics are now fetched directly via syncedlyrics library.
+
+            # Save song with file path
+            update_fields = ['file']
+            track_logs.append(f"DEBUG: Saving song with update_fields: {update_fields}")
+            song.save(update_fields=update_fields)
             track_logs.append(f"Successfully linked downloaded file for '{song.title}': {song.file.name}")
+
         except Exception as e:
             track_logs.append(f"Failed to download or link file for song '{song.title}' (ID: {track_id}): {e}")
             # File field remains empty/unchanged
+            # Save song object even if download failed (artists/album/lyrics links might be useful)
+            # Check if lyrics were fetched and need saving even if download failed
+            if update_fields_lyrics and not all(field in ['lyrics', 'synced_lyrics'] for field in song._meta.fields):
+                 try:
+                     song.save(update_fields=update_fields_lyrics)
+                     track_logs.append(f"Saved fetched lyrics fields after download failure: {', '.join(update_fields_lyrics)}")
+                 except Exception as save_lyr_e:
+                     track_logs.append(f"Error saving fetched lyrics after download failure for '{song.title}': {save_lyr_e}")
+            elif song_created and not update_fields_lyrics: # Save if newly created but no lyrics fetched
+                 song.save()
+
             return song, track_logs # Return song even if download failed
-    # else: # Already printed skip message above
-        # print(f"File already exists for song '{song.title}' (ID: {track_id}). Skipping download.")  
+
+    # If download wasn't needed, but song was created OR lyrics were fetched, save it.
+    elif song_created or update_fields_lyrics:
+        fields_to_save = []
+        if song_created: fields_to_save = None # Save all fields if new
+        elif update_fields_lyrics: fields_to_save = update_fields_lyrics # Only save lyrics fields if existing
+
+        if fields_to_save is None or fields_to_save: # Check if there's anything to save
+            try:
+                song.save(update_fields=fields_to_save)
+                log_msg = "Saved new song metadata" if song_created else f"Saved updated lyrics fields: {', '.join(fields_to_save)}"
+                track_logs.append(f"{log_msg} for '{song.title}' (file already existed).")
+            except Exception as save_e:
+                 track_logs.append(f"Error saving song metadata/lyrics for '{song.title}': {save_e}")
 
 
     return song, track_logs
@@ -1062,3 +1309,66 @@ def process_spotify_playlist(playlist_id, user):
 
     print(f"Finished processing playlist '{playlist_obj.name}'. Processed {len(processed_songs)} tracks.")
     return processed_songs, playlist_obj, playlist_logs
+
+
+# --- MODIFICATION START: Add get_lyrics view ---
+@login_required
+def get_lyrics(request, song_id):
+    """Returns the lyrics for a given song ID."""
+    song = get_object_or_404(Song, id=song_id)
+    # Prioritize synced lyrics if available and not empty
+    has_synced = bool(song.synced_lyrics and song.synced_lyrics.strip())
+    lyrics_content = song.synced_lyrics if has_synced else song.lyrics
+
+    # Check if the chosen lyrics content is actually present and not empty
+    if not lyrics_content or not lyrics_content.strip():
+        return JsonResponse({'status': 'not_found', 'message': 'No lyrics available for this song.'}, status=404)
+
+    return JsonResponse({
+        'status': 'success',
+        'lyrics': lyrics_content,
+        'is_synced': has_synced,
+        'song_id': song_id
+    })
+# --- MODIFICATION END ---
+
+# --- MODIFICATION START: Add update_lyrics view ---
+@login_required
+@require_POST # Expect POST request
+@csrf_protect
+def update_lyrics(request, song_id):
+    """Updates the lyrics (plain or synced) for a given song ID."""
+    song = get_object_or_404(Song, id=song_id)
+
+    try:
+        data = json.loads(request.body)
+        lyrics_content = data.get('lyrics', '') # Default to empty string if not provided
+        is_synced = data.get('is_synced', False)
+
+        if is_synced:
+            # Update only synced_lyrics
+            song.synced_lyrics = lyrics_content
+            # Ensure plain lyrics are also updated if synced lyrics are provided,
+            # assuming the synced version is based on some plain text.
+            # If you want to keep them totally separate, remove the next line.
+            # song.lyrics = lyrics_content # Optional: Update plain lyrics too?
+            update_fields = ['synced_lyrics'] # Add 'lyrics' if updating both
+            print(f"Updating synced lyrics for song ID {song_id}")
+        else:
+            # Update plain lyrics AND clear synced lyrics
+            song.lyrics = lyrics_content
+            song.synced_lyrics = None # Clear synced lyrics
+            update_fields = ['lyrics', 'synced_lyrics'] # Update both fields
+            print(f"Updating plain lyrics and clearing synced lyrics for song ID {song_id}")
+
+        song.save(update_fields=update_fields)
+
+        return JsonResponse({'status': 'success', 'message': 'Lyrics updated successfully.'})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request format.'}, status=400)
+    except Exception as e:
+        print(f"Error updating lyrics for song {song_id}: {e}")
+        print(traceback.format_exc())
+        return JsonResponse({'status': 'error', 'message': 'Could not update lyrics.'}, status=500)
+# --- MODIFICATION END ---
