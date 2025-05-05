@@ -193,12 +193,49 @@ form p {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 15px; /* Consistent padding */
+    padding: 8px 15px; /* Adjusted padding slightly */
     border-bottom: none; /* Remove bottom border */
     transition: background-color 0.2s ease;
     border-radius: 4px;
     min-height: 50px; /* Slightly taller items */
-    cursor: pointer; /* Indicate clickable rows */
+    cursor: default; /* Change default cursor */
+}
+
+/* --- MODIFICATION START: Add styles for item list cover --- */
+.item-list-cover {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    margin-right: 15px; /* Space between image and text */
+    border-radius: 4px; /* Slightly rounded corners */
+    flex-shrink: 0; /* Prevent image from shrinking */
+    background-color: var(--spotify-medium-grey); /* Background for placeholder */
+}
+.item-list-cover.placeholder {
+    /* Specific styles for the div placeholder if needed, e.g., add an icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.item-list-cover.placeholder::before {
+    /* Optional: Add a music note icon as placeholder content */
+    content: "\f001"; /* Font Awesome music icon */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: var(--spotify-light-grey);
+    font-size: 18px;
+}
+/* --- MODIFICATION END --- */
+
+.item-info {
+    flex-grow: 1;
+    margin-right: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent text overflow issues */
+    /* --- MODIFICATION START: Remove left margin if image is present --- */
+    /* margin-left: 0; /* Reset margin-left */
+    /* --- MODIFICATION END --- */
 }
 
 .item-list li:hover, .song-list li:hover {
@@ -1140,26 +1177,83 @@ input[type="range"].volume-bar {
      margin: 0; /* Remove margin from actions div */
      flex-shrink: 0; /* Prevent button shrinking */
      opacity: 1; /* Ensure actions div is visible */
+     /* --- MODIFICATION START: Allow multiple buttons --- */
+     display: flex; /* Ensure buttons are in a row */
+     gap: 10px; /* Add space between buttons */
+     /* --- MODIFICATION END --- */
 }
 
-.album-info .add-library-button {
-    margin: 0; /* Remove margin from button itself */
-    opacity: 1; /* Ensure button is visible */
+/* --- MODIFICATION START: Style Play All button --- */
+.album-info .play-all-button {
+    background-color: var(--spotify-green);
+    color: var(--spotify-black);
+    border: none;
     width: 36px;
     height: 36px;
+    padding: 0; /* Remove padding if using only icon */
+}
+.album-info .play-all-button i {
+    font-size: 16px;
+}
+.album-info .play-all-button:hover {
+    background-color: var(--spotify-green-light);
+    transform: scale(1.05);
+    color: var(--spotify-black); /* Keep icon black */
+}
+/* --- MODIFICATION END --- */
+
+/* --- MODIFICATION START: Style Add All to Queue button --- */
+.album-info .add-all-queue-button {
+    background-color: transparent;
+    border: 1px solid var(--spotify-light-grey);
+    color: var(--spotify-text-grey);
+    width: 36px;
+    height: 36px;
+    padding: 0; /* Remove padding if using only icon */
+}
+.album-info .add-all-queue-button i {
+    font-size: 16px;
+}
+.album-info .add-all-queue-button:hover {
+    border-color: var(--spotify-text-white);
+    color: var(--spotify-text-white);
+    transform: scale(1.05);
+}
+/* --- MODIFICATION END --- */
+
+.album-info .add-library-button { /* Target button specifically */
+    margin: 0; /* Remove margin */
+    opacity: 1; /* Ensure button is visible */
+    width: 36px; /* Specific size */
+    height: 36px;
+    background-color: transparent; /* Make background transparent */
+    border: 1px solid var(--spotify-light-grey); /* Add border */
+    color: var(--spotify-text-grey); /* Icon color */
 }
 .album-info .add-library-button i {
     font-size: 16px; /* Adjust icon size */
+}
+.album-info .add-library-button:hover {
+    border-color: var(--spotify-text-white); /* White border on hover */
+    color: var(--spotify-text-white); /* White icon on hover */
+    transform: scale(1.05); /* Slightly larger */
 }
 .album-info .add-library-button:disabled {
     opacity: 0.6; /* Dim disabled button */
     cursor: not-allowed;
     transform: none; /* Prevent hover scale */
+    border-color: var(--spotify-light-grey); /* Keep border grey */
+    color: var(--spotify-text-grey); /* Keep icon grey */
 }
 .album-info .add-library-button:disabled:hover {
-    color: var(--spotify-text-grey); /* Keep icon grey on hover when disabled */
+    /* No special hover effect for disabled */
+    border-color: var(--spotify-light-grey);
+    color: var(--spotify-text-grey);
 }
-/* --- MODIFICATION END --- */
+/* Style for the checkmark when already in library */
+.album-info .add-library-button:disabled i.fa-check {
+    color: var(--spotify-green); /* Green checkmark */
+}
 
 .album-info p {
     margin: 0 0 5px 0;
@@ -1220,4 +1314,177 @@ input[type="range"].volume-bar {
 .error p { /* Style error messages */
     color: #f44336; /* Red for errors */
     font-weight: bold;
+}
+
+/* --- Album/EP/Single Detail Specific --- */
+.album-header { /* Renamed from .album-header for broader use */
+    display: flex;
+    align-items: flex-end; /* Align items to bottom for better look with varying text length */
+    margin-bottom: 40px;
+    max-width: 900px; /* Consistent max-width */
+    width: 100%;
+    padding: 20px 0; /* Add some vertical padding */
+    gap: 24px; /* Space between cover and info */
+}
+.album-cover { /* Reused class name */
+    width: 180px; /* Slightly larger cover */
+    height: 180px;
+    object-fit: cover;
+    /* margin-right: 24px; */ /* Replaced by gap in .album-header */
+    border-radius: 4px;
+    background-color: var(--spotify-medium-grey); /* Placeholder color */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Add shadow */
+    flex-shrink: 0; /* Prevent cover from shrinking */
+}
+.album-info { /* Reused class name */
+    flex-grow: 1; /* Take remaining space */
+    min-width: 0; /* Prevent flex item overflow */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Align text towards the bottom */
+}
+
+.album-title-header { /* Reused class name */
+    display: flex;
+    align-items: center; /* Vertically align title and button */
+    justify-content: space-between; /* Push button to the right */
+    margin-bottom: 10px; /* Space below title/button */
+    gap: 15px; /* Space between title and button if title wraps */
+}
+
+.album-info h1 { /* Reused class name */
+    margin: 0; /* Remove default h1 margin */
+    font-size: 2.5em; /* Larger title */
+    font-weight: 700;
+    color: var(--spotify-text-white);
+    flex-grow: 1; /* Allow title to take available space */
+    line-height: 1.2;
+    /* Optional: Prevent title from wrapping too aggressively */
+    /* white-space: nowrap; */
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+}
+
+/* Actions within the album-info header (Add to Library button) */
+.album-info .actions { /* Target the actions div specifically */
+     margin: 0; /* Remove margin */
+     flex-shrink: 0; /* Prevent button shrinking */
+     opacity: 1; /* Ensure actions div is visible */
+     /* --- MODIFICATION START: Allow multiple buttons --- */
+     display: flex; /* Ensure buttons are in a row */
+     gap: 10px; /* Add space between buttons */
+     /* --- MODIFICATION END --- */
+}
+
+/* --- MODIFICATION START: Style Play All button --- */
+.album-info .play-all-button {
+    background-color: var(--spotify-green);
+    color: var(--spotify-black);
+    border: none;
+    width: 36px;
+    height: 36px;
+    padding: 0; /* Remove padding if using only icon */
+}
+.album-info .play-all-button i {
+    font-size: 16px;
+}
+.album-info .play-all-button:hover {
+    background-color: var(--spotify-green-light);
+    transform: scale(1.05);
+    color: var(--spotify-black); /* Keep icon black */
+}
+/* --- MODIFICATION END --- */
+
+/* --- MODIFICATION START: Style Add All to Queue button --- */
+.album-info .add-all-queue-button {
+    background-color: transparent;
+    border: 1px solid var(--spotify-light-grey);
+    color: var(--spotify-text-grey);
+    width: 36px;
+    height: 36px;
+    padding: 0; /* Remove padding if using only icon */
+}
+.album-info .add-all-queue-button i {
+    font-size: 16px;
+}
+.album-info .add-all-queue-button:hover {
+    border-color: var(--spotify-text-white);
+    color: var(--spotify-text-white);
+    transform: scale(1.05);
+}
+/* --- MODIFICATION END --- */
+
+.album-info .add-library-button { /* Target button specifically */
+    margin: 0; /* Remove margin */
+    opacity: 1; /* Ensure button is visible */
+    width: 36px; /* Specific size */
+    height: 36px;
+    background-color: transparent; /* Make background transparent */
+    border: 1px solid var(--spotify-light-grey); /* Add border */
+    color: var(--spotify-text-grey); /* Icon color */
+}
+.album-info .add-library-button i {
+    font-size: 16px; /* Adjust icon size */
+}
+.album-info .add-library-button:hover {
+    border-color: var(--spotify-text-white); /* White border on hover */
+    color: var(--spotify-text-white); /* White icon on hover */
+    transform: scale(1.05); /* Slightly larger */
+}
+.album-info .add-library-button:disabled {
+    opacity: 0.6; /* Dim disabled button */
+    cursor: not-allowed;
+    transform: none; /* Prevent hover scale */
+    border-color: var(--spotify-light-grey); /* Keep border grey */
+    color: var(--spotify-text-grey); /* Keep icon grey */
+}
+.album-info .add-library-button:disabled:hover {
+    /* No special hover effect for disabled */
+    border-color: var(--spotify-light-grey);
+    color: var(--spotify-text-grey);
+}
+/* Style for the checkmark when already in library */
+.album-info .add-library-button:disabled i.fa-check {
+    color: var(--spotify-green); /* Green checkmark */
+}
+
+.album-info p { /* Reused class name */
+    margin: 0 0 5px 0;
+    color: var(--spotify-text-grey);
+    text-align: left;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+.album-info p a { /* Style links within album info */
+    color: var(--spotify-text-white);
+    font-weight: 500;
+}
+.album-info p a:hover {
+    text-decoration: underline;
+}
+
+/* Song list specific to detail pages */
+.song-list { /* Reused class name */
+    list-style: none;
+    padding: 0;
+    max-width: 900px; /* Match header width */
+    width: 100%;
+    margin-top: 20px; /* Space above song list */
+}
+/* Styles for li within .song-list are handled by general .item-list li rules */
+/* Ensure play button alignment and visibility works */
+
+.back-link { /* Reused class name */
+    display: block;
+    margin-top: 40px;
+    text-align: left; /* Align left */
+    max-width: 900px; /* Match header width */
+    width: 100%;
+    font-size: 0.9em;
+}
+.back-link a {
+    color: var(--spotify-text-grey);
+}
+.back-link a:hover {
+    color: var(--spotify-text-white);
 }

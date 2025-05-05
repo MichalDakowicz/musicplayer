@@ -4,59 +4,7 @@
 {% block title %}{{ ep.title }} - Music Player{% endblock %}
 
 {% block extra_head %}
-    {# Reuse album detail styles or create specific EP styles if needed #}
-    <style>
-        .album-header { /* Reusing album styles for consistency */
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 30px;
-            max-width: 700px;
-            width: 100%;
-        }
-        .album-cover {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            margin-right: 20px;
-            border-radius: 4px;
-            background-color: #333;
-        }
-        .album-info h1 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            text-align: left;
-        }
-        .album-info p {
-            margin: 5px 0;
-            color: #b3b3b3;
-            text-align: left;
-        }
-        .song-list {
-            list-style: none;
-            padding: 0;
-            max-width: 700px;
-            width: 100%;
-        }
-        .back-link {
-            display: block;
-            margin-top: 30px;
-            text-align: center;
-            max-width: 700px;
-            width: 100%;
-        }
-        .album-title-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            gap: 15px;
-        }
-        .album-info h1 { margin: 0; flex-grow: 1; }
-        .album-info .actions { margin: 0; flex-shrink: 0; }
-        .album-info .add-library-button { margin: 0; opacity: 1; width: 36px; height: 36px; }
-        .album-info .add-library-button i { font-size: 16px; }
-        .album-info .add-library-button:disabled { opacity: 0.6; cursor: not-allowed; }
-    </style>
+    {# Removed inline styles - they are now in style.css #}
 {% endblock %}
 
 {% block content %}
@@ -72,6 +20,18 @@
             <div class="album-title-header">
                 <h1>{{ ep.title }}</h1>
                 <div class="actions">
+                    {% if ep_songs %}
+                    <button type="button" class="action-button play-all-button"
+                            data-song-ids="{{ song_ids_str }}"
+                            title="Play EP">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button type="button" class="action-button add-all-queue-button"
+                            data-song-ids="{{ song_ids_str }}"
+                            title="Add EP to Queue">
+                        <i class="fa-solid fa-list-ul"></i>
+                    </button>
+                    {% endif %}
                     {% if ep.id in user_library_ep_ids %}
                         <button type="button" class="action-button add-library-button" disabled title="Already in Library">
                             <i class="fa-solid fa-check"></i>
@@ -95,20 +55,21 @@
     </div>
 
     {% if ep_songs %}
-        <ul class="song-list">
+        <ul class="song-list"> {# Uses general .song-list styles #}
             {% for song in ep_songs %}
-                <li>
-                    <span>{{ song.title }}</span>
-                    <div class="actions">
+                <li> {# Uses general li styles #}
+                    <span>{{ song.title }}</span> {# Uses general span styles #}
+                    <div class="actions"> {# Uses general .actions styles #}
                         {% if song.file %}
+                            {% with release=song.get_release %}
                             <button type="button" class="action-button play-button"
                                     data-song-url="{{ song.file.url }}"
                                     data-song-title="{{ song.title }}"
                                     data-song-artist="{% for artist in song.artists.all %}{{ artist.name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
-                                    data-song-cover="{% with release=song.get_release %}{% if release.cover_image %}{{ release.cover_image.url }}{% elif release.cover_image_url %}{{ release.cover_image_url }}{% else %}{% static 'placeholder-cover.png' %}{% endif %}{% endwith %}"
+                                    data-song-cover="{% if release %}{% if release.cover_image %}{{ release.cover_image.url }}{% elif release.cover_image_url %}{{ release.cover_image_url }}{% else %}{% static 'placeholder-cover.png' %}{% endif %}{% else %}{% static 'placeholder-cover.png' %}{% endif %}"
                                     data-song-id="{{ song.id }}">
-                                Play
                             </button>
+                            {% endwith %}
                             <button type="button" class="action-button add-queue-button" data-song-id="{{ song.id }}">
                                 <i class="fa-solid fa-list-ul"></i>
                             </button>
@@ -120,7 +81,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p style="text-align: center; max-width: 700px; width: 100%;">No songs found for this EP.</p>
+        <p style="text-align: center; max-width: 900px; width: 100%;">No songs found for this EP.</p> {# Adjusted max-width #}
     {% endif %}
 
     <p class="back-link">

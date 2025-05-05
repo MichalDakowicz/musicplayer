@@ -331,23 +331,25 @@ def browse_media(request):
 def album_detail(request, album_id):
     """Displays details for a specific album and its songs."""
     album = get_object_or_404(Album, id=album_id)
-    album_songs = album.songs.all().order_by('title') # Or by track number if you add it
+    # --- MODIFICATION START: Order by track_number ---
+    album_songs = album.songs.all().order_by('track_number', 'title') # Order by track number
+    # --- MODIFICATION END ---
 
-    # --- MODIFICATION START: Fetch user library info ---
+    song_ids_list = list(album_songs.values_list('id', flat=True))
+    song_ids_str = ",".join(map(str, song_ids_list))
+
     user_library_album_ids = []
     try:
         library = request.user.library
         user_library_album_ids = list(library.albums.values_list('id', flat=True))
     except (Library.DoesNotExist, AttributeError):
-        pass # User might not have a library yet
-    # --- MODIFICATION END ---
+        pass
 
     context = {
         'album': album,
         'album_songs': album_songs,
-        # --- MODIFICATION START: Add library info to context ---
         'user_library_album_ids': user_library_album_ids,
-        # --- MODIFICATION END ---
+        'song_ids_str': song_ids_str,
     }
     return render(request, 'album_detail.html', context)
 
@@ -356,7 +358,12 @@ def album_detail(request, album_id):
 def ep_detail(request, ep_id):
     """Displays details for a specific EP and its songs."""
     ep = get_object_or_404(EP, id=ep_id)
-    ep_songs = ep.songs.all().order_by('title')
+    # --- MODIFICATION START: Order by track_number ---
+    ep_songs = ep.songs.all().order_by('track_number', 'title') # Order by track number
+    # --- MODIFICATION END ---
+
+    song_ids_list = list(ep_songs.values_list('id', flat=True))
+    song_ids_str = ",".join(map(str, song_ids_list))
 
     user_library_ep_ids = []
     try:
@@ -369,6 +376,7 @@ def ep_detail(request, ep_id):
         'ep': ep,
         'ep_songs': ep_songs,
         'user_library_ep_ids': user_library_ep_ids,
+        'song_ids_str': song_ids_str,
     }
     return render(request, 'ep_detail.html', context)
 # --- MODIFICATION END ---
@@ -378,7 +386,13 @@ def ep_detail(request, ep_id):
 def single_detail(request, single_id):
     """Displays details for a specific single and its songs."""
     single = get_object_or_404(Single, id=single_id)
-    single_songs = single.songs.all().order_by('title')
+    # --- MODIFICATION START: Order by track_number ---
+    # Singles might only have one track, but ordering doesn't hurt
+    single_songs = single.songs.all().order_by('track_number', 'title') # Order by track number
+    # --- MODIFICATION END ---
+
+    song_ids_list = list(single_songs.values_list('id', flat=True))
+    song_ids_str = ",".join(map(str, song_ids_list))
 
     user_library_single_ids = []
     try:
@@ -391,6 +405,7 @@ def single_detail(request, single_id):
         'single': single,
         'single_songs': single_songs,
         'user_library_single_ids': user_library_single_ids,
+        'song_ids_str': song_ids_str,
     }
     return render(request, 'single_detail.html', context)
 # --- MODIFICATION END ---
@@ -466,7 +481,7 @@ def add_spotify_content(request):
     logs = [] # Collect logs to display on the template
     if request.method == 'POST':
         form = SpotifyUrlForm(request.POST)
-        if form.is_valid():
+        if (form.is_valid()):
             # Correct the key used to access cleaned_data
             spotify_url = form.cleaned_data['spotify_url']
             # Extract the type and ID from the URL
@@ -1004,6 +1019,9 @@ def process_spotify_track(track_id, user):
         'album': release_obj if isinstance(release_obj, Album) else None,
         'ep': release_obj if isinstance(release_obj, EP) else None,
         'single': release_obj if isinstance(release_obj, Single) else None,
+        # --- MODIFICATION START: Add track_number ---
+        'track_number': track_info.get('track_number'), # Get track number from Spotify data
+        # --- MODIFICATION END ---
         # Initialize lyrics fields as empty, they will be fetched next
         'lyrics': None,
         'synced_lyrics': None,
@@ -1142,7 +1160,7 @@ def process_spotify_track(track_id, user):
         if fields_to_save is None or fields_to_save: # Check if there's anything to save
             try:
                 song.save(update_fields=fields_to_save)
-                log_msg = "Saved new song metadata" if song_created else f"Saved updated lyrics fields: {', '.join(fields_to_save)}"
+                log_msg = "Saved new song metadata" if song_created else f"Saved updated lyrics fields: {', '.join(update_fields_lyrics)}"
                 track_logs.append(f"{log_msg} for '{song.title}' (file already existed).")
             except Exception as save_e:
                  track_logs.append(f"Error saving song metadata/lyrics for '{song.title}': {save_e}")
@@ -1371,4 +1389,65 @@ def update_lyrics(request, song_id):
         print(f"Error updating lyrics for song {song_id}: {e}")
         print(traceback.format_exc())
         return JsonResponse({'status': 'error', 'message': 'Could not update lyrics.'}, status=500)
+# --- MODIFICATION END ---
+
+# --- MODIFICATION START: Add add_multiple_to_queue view ---
+@login_required
+@require_POST # Expect POST request
+@csrf_protect
+def add_multiple_to_queue(request):
+    """Adds multiple songs to the end of the user's queue based on a list of song IDs."""
+    try:
+        data = json.loads(request.body)
+        song_ids = data.get('song_ids', [])
+
+        if not isinstance(song_ids, list) or not song_ids:
+            return JsonResponse({'status': 'error', 'message': 'Invalid or empty song_ids list.'}, status=400)
+
+        # Validate song IDs and ensure they are integers
+        try:
+            valid_song_ids = [int(sid) for sid in song_ids]
+        except (ValueError, TypeError):
+            return JsonResponse({'status': 'error', 'message': 'Invalid song ID format found in list.'}, status=400)
+
+        # Fetch songs efficiently, ensuring they exist
+        songs_to_add = Song.objects.filter(id__in=valid_song_ids)
+        if songs_to_add.count() != len(valid_song_ids):
+            # Find which IDs were invalid (optional, for better error message)
+            found_ids = set(songs_to_add.values_list('id', flat=True))
+            missing_ids = [sid for sid in valid_song_ids if sid not in found_ids]
+            print(f"Warning: Could not find all requested songs. Missing IDs: {missing_ids}")
+            # Proceed with the songs that were found, or return an error
+
+        if not songs_to_add.exists():
+             return JsonResponse({'status': 'error', 'message': 'None of the requested songs were found.'}, status=404)
+
+        queue, _ = Queue.objects.get_or_create(user=request.user)
+        added_count = 0
+
+        with transaction.atomic():
+            # Find the current highest order number
+            last_item = queue.items.aggregate(Max('order'))
+            next_order_start = (last_item['order__max'] or 0) + 1
+
+            # Create QueueItem objects in bulk if possible, or loop
+            # Note: Bulk create doesn't work well if you need to maintain specific order from input list easily
+            # Looping is simpler here to guarantee order.
+            current_order = next_order_start
+            # Preserve the order from the input list
+            song_map = {song.id: song for song in songs_to_add}
+            for song_id in valid_song_ids:
+                if song_id in song_map:
+                    QueueItem.objects.create(queue=queue, song=song_map[song_id], order=current_order)
+                    current_order += 1
+                    added_count += 1
+
+        return JsonResponse({'status': 'success', 'message': f"{added_count} song(s) added to queue."})
+
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request format.'}, status=400)
+    except Exception as e:
+        print(f"Error adding multiple songs to queue for user {request.user.id}: {e}")
+        print(traceback.format_exc())
+        return JsonResponse({'status': 'error', 'message': 'Could not add songs to queue.'}, status=500)
 # --- MODIFICATION END ---

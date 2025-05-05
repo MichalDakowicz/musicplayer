@@ -74,7 +74,9 @@ class Song(models.Model):
     album = models.ForeignKey(Album, related_name='songs', on_delete=models.SET_NULL, null=True, blank=True) # Changed to SET_NULL, allow null
     ep = models.ForeignKey(EP, related_name='songs', on_delete=models.SET_NULL, null=True, blank=True) # Optional: Added FK to EP
     single = models.ForeignKey(Single, related_name='songs', on_delete=models.SET_NULL, null=True, blank=True) # Optional: Added FK to Single
-
+    # --- MODIFICATION START: Add track_number ---
+    track_number = models.PositiveIntegerField(null=True, blank=True, help_text="Track number within the release")
+    # --- MODIFICATION END ---
     duration = models.DurationField(null=True, blank=True) # Allow null
     file = models.FileField(upload_to='songs/', max_length=500) # Increased max_length
     lyrics = models.TextField(blank=True, null=True)
@@ -89,10 +91,16 @@ class Song(models.Model):
         artist_names = ", ".join([a.name for a in self.artists.all()])
         release = self.get_release()
         release_title = release.title if release else "Unknown Release"
-        return f"{self.title} - {artist_names} ({release_title})" # Updated
+        # --- MODIFICATION START: Add track number to string representation ---
+        track_num_str = f" (Track {self.track_number})" if self.track_number else ""
+        return f"{self.title}{track_num_str} - {artist_names} ({release_title})" # Updated
+        # --- MODIFICATION END ---
 
     class Meta:
         verbose_name_plural = "Songs"
+        # --- MODIFICATION START: Add default ordering ---
+        ordering = ['track_number', 'title'] # Order by track number, then title
+        # --- MODIFICATION END ---
 
 class Playlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='playlists')

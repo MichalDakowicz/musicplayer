@@ -20,6 +20,9 @@ urlpatterns = [
 
     # Queue URLs
     path('queue/add/<int:song_id>/', views.add_to_queue, name='add_to_queue'),
+    # --- MODIFICATION START: Add URL for adding multiple songs ---
+    path('queue/add_multiple/', views.add_multiple_to_queue, name='add_multiple_to_queue'),
+    # --- MODIFICATION END ---
     path('queue/next/', views.get_next_in_queue, name='get_next_in_queue'),
     path('queue/previous/', views.get_previous_in_queue, name='get_previous_in_queue'), # Added
     path('queue/view/', views.view_queue, name='view_queue'), # Added

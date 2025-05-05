@@ -12,8 +12,14 @@
         <ul class="item-list">
             {% for album in all_albums %}
                 <li>
+                    {% if album.cover_image %}
+                        <img src="{{ album.cover_image.url }}" alt="{{ album.title }} Cover" class="item-list-cover">
+                    {% elif album.cover_image_url %}
+                        <img src="{{ album.cover_image_url }}" alt="{{ album.title }} Cover (URL)" class="item-list-cover">
+                    {% else %}
+                        <div class="item-list-cover placeholder"></div>
+                    {% endif %}
                     <span class="item-info">
-                        {# Link to album detail view #}
                         <a href="{% url 'album_detail' album.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'album_detail' album.id %}">{{ album.title }}</a>
                         <span class="item-artist">{{ album.artists.first.name }}{% if album.artists.count > 1 %}, and others{% endif %}</span>
                     </span>
@@ -44,10 +50,15 @@
         <ul class="item-list">
             {% for ep in all_eps %}
                 <li>
+                    {% if ep.cover_image %}
+                        <img src="{{ ep.cover_image.url }}" alt="{{ ep.title }} Cover" class="item-list-cover">
+                    {% elif ep.cover_image_url %}
+                        <img src="{{ ep.cover_image_url }}" alt="{{ ep.title }} Cover (URL)" class="item-list-cover">
+                    {% else %}
+                        <div class="item-list-cover placeholder"></div>
+                    {% endif %}
                     <span class="item-info">
-                        {# --- MODIFICATION START: Link to EP detail view --- #}
                         <a href="{% url 'ep_detail' ep.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'ep_detail' ep.id %}">{{ ep.title }}</a>
-                        {# --- MODIFICATION END --- #}
                         <span class="item-artist">{{ ep.artists.first.name }}{% if ep.artists.count > 1 %}, and others{% endif %}</span>
                     </span>
                     <div class="actions">
@@ -77,10 +88,15 @@
         <ul class="item-list">
             {% for single in all_singles %}
                 <li>
+                    {% if single.cover_image %}
+                        <img src="{{ single.cover_image.url }}" alt="{{ single.title }} Cover" class="item-list-cover">
+                    {% elif single.cover_image_url %}
+                        <img src="{{ single.cover_image_url }}" alt="{{ single.title }} Cover (URL)" class="item-list-cover">
+                    {% else %}
+                        <div class="item-list-cover placeholder"></div>
+                    {% endif %}
                     <span class="item-info">
-                        {# --- MODIFICATION START: Link to Single detail view --- #}
                         <a href="{% url 'single_detail' single.id %}" class="ajax-link detail-link item-title" data-target-url="{% url 'single_detail' single.id %}">{{ single.title }}</a>
-                        {# --- MODIFICATION END --- #}
                         <span class="item-artist">{{ single.artists.first.name }}{% if single.artists.count > 1 %}, and others{% endif %}</span>
                     </span>
                     <div class="actions">
